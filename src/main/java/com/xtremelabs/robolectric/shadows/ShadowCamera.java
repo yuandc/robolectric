@@ -13,21 +13,15 @@ import com.xtremelabs.robolectric.internal.RealObject;
 @Implements(Camera.class)
 public class ShadowCamera {
 
-    private boolean locked;
-    private boolean previewing;
-    private boolean released;
+    private boolean locked = true;
+    private boolean previewing = false;
+    private boolean released = false;
     private Camera.Parameters parameters;
     private Camera.PreviewCallback previewCallback;
     private SurfaceHolder surfaceHolder;
 
     @RealObject
     private Camera realCamera;
-
-    public void __constructor__() {
-        locked = true;
-        previewing = false;
-        released = false;
-    }
 
     @Implementation
     public static Camera open() {

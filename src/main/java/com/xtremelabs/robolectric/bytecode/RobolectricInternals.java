@@ -13,16 +13,6 @@ public class RobolectricInternals {
     private static ClassHandler classHandler;
     private static Set<String> unloadableClassNames = new HashSet<String>();
 
-    private static final ThreadLocal<Vars> ALL_VARS = new ThreadLocal<Vars>() {
-        @Override protected Vars initialValue() {
-            return new Vars();
-        }
-    };
-
-    private static class Vars {
-        Object callDirectly;
-    }
-
     public static <T> T newInstanceOf(Class<T> clazz) {
         try {
             Constructor<T> defaultConstructor = clazz.getDeclaredConstructor();
@@ -77,7 +67,7 @@ public class RobolectricInternals {
     }
 
     public static <T> T directlyOn(T shadowedObject) {
-        Vars vars = ALL_VARS.get();
+        Vars vars = AndroidTranslator.ALL_VARS.get();
 
         if (vars.callDirectly != null) {
             Object expectedInstance = vars.callDirectly;
@@ -90,19 +80,22 @@ public class RobolectricInternals {
     }
 
     public static boolean shouldCallDirectly(Object directInstance) {
-        Vars vars = ALL_VARS.get();
-        if (vars.callDirectly != null) {
-            if (vars.callDirectly != directInstance) {
-                Object expectedInstance = vars.callDirectly;
-                vars.callDirectly = null;
-                throw new RuntimeException("expected to perform direct call on <" + expectedInstance + "> but got <" + directInstance + ">");
-            } else {
-                vars.callDirectly = null;
-            }
+        Vars vars = AndroidTranslator.ALL_VARS.get();
+        Object expectedInstance = vars.callDirectly;
+        vars.callDirectly = null;
+
+        if (directInstance == expectedInstance) {
             return true;
-        } else {
+        }
+        if (expectedInstance == null) {
             return false;
         }
+        throw new RuntimeException("expected to perform direct call on <" + expectedInstance + "> but got <" + directInstance + ">");
+    }
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    public static void classInitializing(Class clazz) throws Exception {
+        classHandler.classInitializing(clazz);
     }
 
     @SuppressWarnings({"UnusedDeclaration"})

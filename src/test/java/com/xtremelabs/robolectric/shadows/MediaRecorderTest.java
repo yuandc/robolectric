@@ -26,6 +26,7 @@ public class MediaRecorderTest {
     }
 
     @Test
+//    @Ignore // API level 8 not yet reviscerated
     public void testAudioChannels() throws Exception {
         assertThat(shadowMediaRecorder.getAudioChannels(), not(equalTo(2)));
         mediaRecorder.setAudioChannels(2);
@@ -42,6 +43,7 @@ public class MediaRecorderTest {
     }
 
     @Test
+//    @Ignore // API level 8 not yet reviscerated
     public void testAudioEncodingBitRate() throws Exception {
         assertThat(shadowMediaRecorder.getAudioEncodingBitRate(), not(equalTo(128000)));
         mediaRecorder.setAudioEncodingBitRate(128000);
@@ -49,6 +51,7 @@ public class MediaRecorderTest {
     }
 
     @Test
+//    @Ignore // API level 8 not yet reviscerated
     public void testAudioSamplingRate() throws Exception {
         assertThat(shadowMediaRecorder.getAudioSamplingRate(), not(equalTo(22050)));
         mediaRecorder.setAudioSamplingRate(22050);
@@ -144,6 +147,7 @@ public class MediaRecorderTest {
     }
 
     @Test
+//    @Ignore // API level 8 not yet reviscerated
     public void testVideoEncodingBitRate() throws Exception {
         assertThat(shadowMediaRecorder.getVideoEncodingBitRate(), not(equalTo(320000)));
         mediaRecorder.setVideoEncodingBitRate(320000);

@@ -1,5 +1,7 @@
 package com.xtremelabs.robolectric.bytecode;
 
+import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.RobolectricTestRunner;
 import com.xtremelabs.robolectric.internal.RealObject;
 import com.xtremelabs.robolectric.util.Join;
 import javassist.CannotCompileException;
@@ -22,6 +24,7 @@ import java.util.Map;
 
 public class ShadowWrangler implements ClassHandler {
     public static final String SHADOW_FIELD_NAME = "__shadow__";
+    private static final boolean STRIP_SHADOW_STACK_TRACES = true;
 
     private static ShadowWrangler singleton;
 
@@ -31,6 +34,8 @@ public class ShadowWrangler implements ClassHandler {
     private Map<String, String> shadowClassMap = new HashMap<String, String>();
     private Map<Class, Field> shadowFieldMap = new HashMap<Class, Field>();
     private boolean logMissingShadowMethods = false;
+    private StaticInitializerRegistry deferredStaticInitializers = new StaticInitializerRegistry();
+    private final List<String> stubbedPackages = new ArrayList<String>();
 
     // sorry! it really only makes sense to have one per ClassLoader anyway though [xw/hu]
     public static ShadowWrangler getInstance() {
@@ -40,7 +45,26 @@ public class ShadowWrangler implements ClassHandler {
         return singleton;
     }
 
+    public static ShadowWrangler newShadowWranglerForTest() {
+        return new ShadowWrangler();
+    }
+
+    public static boolean isShadowClass(Class<?> declaringClass) {
+        // why doesn't getAnnotation(com.xtremelabs.robolectric.internal.Implements) work here? It always returns null. pg 20101115
+        for (Annotation annotation : declaringClass.getAnnotations()) {
+            if (annotation.annotationType().toString().equals("interface com.xtremelabs.robolectric.internal.Implements")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private ShadowWrangler() {
+        initializeStubbedPackageList();
+    }
+
+    private void initializeStubbedPackageList() {
+        stubbedPackages.add("com.google.android.maps");
     }
 
     @Override
@@ -70,42 +94,92 @@ public class ShadowWrangler implements ClassHandler {
     public void afterTest() {
     }
 
+    @Override public void classInitializing(Class clazz) {
+        deferredStaticInitializers.deferInitializationOf(clazz);
+    }
+
     public void bindShadowClass(Class<?> realClass, Class<?> shadowClass) {
+        deferredStaticInitializers.initializeUsingShadow(realClass, shadowClass);
         shadowClassMap.put(realClass.getName(), shadowClass.getName());
         if (debug) System.out.println("shadow " + realClass + " with " + shadowClass);
+    }
+
+    public void runDeferredStaticInitializers() {
+        deferredStaticInitializers.runDeferredInitializers();
     }
 
     @Override
     public Object methodInvoked(Class clazz, String methodName, Object instance, String[] paramTypes, Object[] params) throws Throwable {
         InvocationPlan invocationPlan = new InvocationPlan(clazz, methodName, instance, paramTypes);
-        if (!invocationPlan.prepare()) {
-            reportNoShadowMethodFound(clazz, methodName, paramTypes);
+        try {
+            if (!invocationPlan.prepare()) {
+                reportNoShadowMethodFound(clazz, methodName, paramTypes);
+                if (RobolectricTestRunner.USE_REAL_ANDROID_SOURCES && !classIsStubbed(clazz)) {
+                    return delegateBackToReal(invocationPlan, params);
+                } else {
+                    return null;
+                }
+            }
+
+            return invocationPlan.getMethod().invoke(invocationPlan.getShadow(), params);
+        } catch (IllegalArgumentException e) {
+            Object shadow = invocationPlan.getShadow();
+            Class<? extends Object> aClass = shadow == null ? null:shadow.getClass();
+            String aClassName = aClass == null ? "<unknown class>":aClass.getName();
+            throw new RuntimeException(aClassName + " is not assignable from " +
+                    invocationPlan.getDeclaredShadowClass().getName(), e);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof Exception) {
+                throw stripStackTrace((Exception) cause);
+            }
+            throw new RuntimeException(cause);
+        }
+    }
+
+    public List<String> getStubbedPackages() {
+        return stubbedPackages;
+    }
+
+    public boolean classIsStubbed(Class clazz) {
+        for (String packagePrefix : stubbedPackages) {
+            if (clazz.getName().startsWith(packagePrefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private Object delegateBackToReal(InvocationPlan invocationPlan, Object[] params) throws InvocationTargetException, IllegalAccessException {
+        if (invocationPlan.methodName.startsWith("<")) {
             return null;
         }
 
         try {
-            return invocationPlan.getMethod().invoke(invocationPlan.getShadow(), params);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException(invocationPlan.getShadow().getClass().getName() + " is not assignable from " +
-                    invocationPlan.getDeclaredShadowClass().getName(), e);
-        } catch (InvocationTargetException e) {
-            throw stripStackTrace(e.getCause());
+            Method method = invocationPlan.clazz.getDeclaredMethod(invocationPlan.methodName, invocationPlan.paramClasses);
+            method.setAccessible(true);
+            Robolectric.directlyOn(invocationPlan.instance == null ? invocationPlan.clazz : invocationPlan.instance);
+            return method.invoke(invocationPlan.instance, params);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
     }
 
     private <T extends Throwable> T stripStackTrace(T throwable) {
-        List<StackTraceElement> stackTrace = new ArrayList<StackTraceElement>();
-        for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
-            String className = stackTraceElement.getClassName();
-            boolean isInternalCall = className.startsWith("sun.reflect.")
-                    || className.startsWith("java.lang.reflect.")
-                    || className.equals(ShadowWrangler.class.getName())
-                    || className.equals(RobolectricInternals.class.getName());
-            if (!isInternalCall) {
-                stackTrace.add(stackTraceElement);
+        if (STRIP_SHADOW_STACK_TRACES) {
+            List<StackTraceElement> stackTrace = new ArrayList<StackTraceElement>();
+            for (StackTraceElement stackTraceElement : throwable.getStackTrace()) {
+                String className = stackTraceElement.getClassName();
+                boolean isInternalCall = className.startsWith("sun.reflect.")
+                        || className.startsWith("java.lang.reflect.")
+                        || className.equals(ShadowWrangler.class.getName())
+                        || className.equals(RobolectricInternals.class.getName());
+                if (!isInternalCall) {
+                    stackTrace.add(stackTraceElement);
+                }
             }
+            throwable.setStackTrace(stackTrace.toArray(new StackTraceElement[stackTrace.size()]));
         }
-        throwable.setStackTrace(stackTrace.toArray(new StackTraceElement[stackTrace.size()]));
         return throwable;
     }
 
@@ -236,7 +310,11 @@ public class ShadowWrangler implements ClassHandler {
             throw new NullPointerException("can't get a shadow for null");
         }
         Field field = getShadowField(instance);
-        return readField(instance, field);
+        Object shadow = readField(instance, field);
+        if (shadow == null) {
+            shadow = shadowFor(instance);
+        }
+        return shadow;
     }
 
     private Object readField(Object target, Field field) {
@@ -259,7 +337,7 @@ public class ShadowWrangler implements ClassHandler {
         logMissingShadowMethods = true;
     }
 
-    public void silence() {
+    public void silenceMissingMethodsLogger() {
         logMissingShadowMethods = false;
     }
 
@@ -269,6 +347,7 @@ public class ShadowWrangler implements ClassHandler {
         private String methodName;
         private Object instance;
         private String[] paramTypes;
+        private Class<?>[] paramClasses;
         private Class<?> declaredShadowClass;
         private Method method;
         private Object shadow;
@@ -294,7 +373,7 @@ public class ShadowWrangler implements ClassHandler {
         }
 
         public boolean prepare() {
-            Class<?>[] paramClasses = getParamClasses();
+            paramClasses = getParamClasses();
 
             Class<?> originalClass = loadClass(clazz.getName(), classLoader);
 
@@ -390,13 +469,7 @@ public class ShadowWrangler implements ClassHandler {
 
         private boolean isOnShadowClass(Method method) {
             Class<?> declaringClass = method.getDeclaringClass();
-            // why doesn't getAnnotation(com.xtremelabs.robolectric.internal.Implements) work here? It always returns null. pg 20101115
-            for (Annotation annotation : declaringClass.getAnnotations()) {
-                if (annotation.annotationType().toString().equals("interface com.xtremelabs.robolectric.internal.Implements")) {
-                    return true;
-                }
-            }
-            return false;
+            return isShadowClass(declaringClass);
         }
 
         @Override

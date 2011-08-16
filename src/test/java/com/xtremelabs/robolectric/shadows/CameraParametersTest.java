@@ -42,6 +42,7 @@ public class CameraParametersTest {
     }
 
     @Test
+//    @Ignore // API level 9 not yet reviscerated
     public void testPreviewFpsRange() throws Exception {
         int[] fpsRange = new int[2];
         parameters.getPreviewFpsRange(fpsRange);
@@ -114,6 +115,7 @@ public class CameraParametersTest {
     }
 
     @Test
+//    @Ignore // API level 9 not yet reviscerated
     public void testGetSupportedPreviewFpsRange() throws Exception {
         List<int[]> supportedRanges = parameters.getSupportedPreviewFpsRange();
         assertThat(supportedRanges, notNullValue());

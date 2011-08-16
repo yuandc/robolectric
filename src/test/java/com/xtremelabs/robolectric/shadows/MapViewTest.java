@@ -5,9 +5,10 @@ import android.graphics.Point;
 import android.view.MotionEvent;
 import android.view.View;
 import com.google.android.maps.GeoPoint;
+import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
+import com.google.android.maps.OverlayItem;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
-import com.xtremelabs.robolectric.bytecode.AndroidTranslatorTest;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -163,12 +164,20 @@ public class MapViewTest {
         }
     }
 
-    private class MyOverlay extends AndroidTranslatorTest.ItemizedOverlayForTests {
+    private class MyOverlay extends ItemizedOverlay {
         private MotionEvent lastMotionEvent;
         private boolean shouldConsumeEvent = true;
 
         public MyOverlay() {
             super(null);
+        }
+
+        @Override protected OverlayItem createItem(int i) {
+            return null;
+        }
+
+        @Override public int size() {
+            return 0;
         }
 
         @Override public boolean onTouchEvent(MotionEvent motionEvent, MapView mapView) {

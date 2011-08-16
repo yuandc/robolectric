@@ -36,7 +36,7 @@ public class ClassCache {
                     }
                 }
             }
-            if (cacheVersion != expectedCacheVersion) {
+            if (cacheVersion != expectedCacheVersion || expectedCacheVersion == -1) {
                 cacheJarFile.delete();
             } else {
                 readEntries(cacheFile);

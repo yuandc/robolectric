@@ -2,9 +2,11 @@ package com.xtremelabs.robolectric;
 
 import android.app.Application;
 import android.net.Uri__FromAndroid;
+import com.xtremelabs.robolectric.bytecode.AndroidTranslator;
 import com.xtremelabs.robolectric.bytecode.ClassHandler;
 import com.xtremelabs.robolectric.bytecode.RobolectricClassLoader;
 import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
+import com.xtremelabs.robolectric.bytecode.Vars;
 import com.xtremelabs.robolectric.internal.RealObject;
 import com.xtremelabs.robolectric.internal.RobolectricTestRunnerInterface;
 import com.xtremelabs.robolectric.res.ResourceLoader;
@@ -25,6 +27,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +40,7 @@ import java.util.Map;
 public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements RobolectricTestRunnerInterface {
     private static RobolectricClassLoader defaultLoader;
     private static Map<RobolectricConfig, ResourceLoader> resourceLoaderForRootAndDirectory = new HashMap<RobolectricConfig, ResourceLoader>();
+    public static final boolean USE_REAL_ANDROID_SOURCES = false;
 
     // fields in the RobolectricTestRunner in the original ClassLoader
     private RobolectricClassLoader classLoader;
@@ -46,9 +52,33 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
     private static RobolectricClassLoader getDefaultLoader() {
         if (defaultLoader == null) {
-            defaultLoader = new RobolectricClassLoader(ShadowWrangler.getInstance());
+            if (USE_REAL_ANDROID_SOURCES) {
+                String androidSourcesPrefix = "file:///Users/pivotal/android-real-jars/gingerbread";
+                URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
+                        parseUrl("file:///Users/pivotal/android-sdk-mac_x86/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
+                        parseUrl(androidSourcesPrefix + "/classes.jar"),
+                        parseUrl(androidSourcesPrefix + "/kxml2-2.3.0.jar")
+                }, null);
+//                String androidSourcesPrefix = "file:///Volumes/Android9Source";
+//                URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
+//                        parseUrl("file:///Users/pivotal/android/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
+//                        parseUrl(androidSourcesPrefix + "/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates/classes.jar"),
+//                        parseUrl(androidSourcesPrefix + "/prebuilt/common/kxml2/kxml2-2.3.0.jar")
+//                }, null);
+                defaultLoader = new RobolectricClassLoader(realAndroidJarsClassLoader, ShadowWrangler.getInstance());
+            } else {
+                defaultLoader = new RobolectricClassLoader(ShadowWrangler.getInstance());
+            }
         }
         return defaultLoader;
+    }
+
+    private static URL parseUrl(String url) {
+        try {
+            return new URL(url);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -167,6 +197,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
             delegateLoadingOf(RealObject.class.getName());
             delegateLoadingOf(ShadowWrangler.class.getName());
             delegateLoadingOf(RobolectricConfig.class.getName());
+            delegateLoadingOf(Vars.class.getName());
             delegateLoadingOf(android.R.class.getName());
 
             Class<?> delegateClass = classLoader.bootstrap(this.getClass());
@@ -238,6 +269,14 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     }
 
     /*
+     * Wraps the test execution with code that checks for outstanding direct calls just before the check for expected
+     * exceptions. This lets us write tests that expect this exception.
+     */
+    @Override protected Statement methodInvoker(FrameworkMethod method, Object test) {
+        return new ExpectNoOutstandingDirectCalls(super.methodInvoker(method, test));
+    }
+
+    /*
      * Called before each test method is run. Sets up the simulation of the Android runtime environment.
      */
     @Override public void internalBeforeTest(final Method method) {
@@ -291,6 +330,8 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
 
     public void setupApplicationState(final RobolectricConfig robolectricConfig) {
         ResourceLoader resourceLoader = createResourceLoader(robolectricConfig);
+
+        Robolectric.silenceMissingMethodsLogger();
 
         Robolectric.bindDefaultShadowClasses();
         bindShadowClasses();
@@ -350,5 +391,24 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
         String projectPackage = doc.getElementsByTagName("manifest").item(0).getAttributes().getNamedItem("package").getTextContent();
 
         return projectPackage + ".R";
+    }
+
+    private static class ExpectNoOutstandingDirectCalls extends Statement {
+        private final Statement next;
+
+        public ExpectNoOutstandingDirectCalls(Statement next) {
+            this.next = next;
+        }
+
+        @Override
+        public void evaluate() throws Throwable {
+            next.evaluate();
+            Vars vars = AndroidTranslator.ALL_VARS.get();
+            Object directCallee = vars.callDirectly;
+            if (directCallee != null) {
+                vars.callDirectly = null;
+                throw new IllegalStateException("Expected a direct call to a shadowed method on <" + directCallee + "> that never happened. (Was a non-shadowed method called instead?)");
+            }
+        }
     }
 }

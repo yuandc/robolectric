@@ -1,14 +1,13 @@
 package com.xtremelabs.robolectric;
 
 
-import static com.xtremelabs.robolectric.util.TestUtil.resourceFile;
+import com.xtremelabs.robolectric.bytecode.RobolectricClassLoader;
+import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
+import org.junit.runners.model.InitializationError;
 
 import java.util.ArrayList;
 
-import org.junit.runners.model.InitializationError;
-
-import com.xtremelabs.robolectric.bytecode.RobolectricClassLoader;
-import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
+import static com.xtremelabs.robolectric.util.TestUtil.resourceFile;
 
 public class WithCustomClassListTestRunner extends RobolectricTestRunner {
 
@@ -19,7 +18,7 @@ public class WithCustomClassListTestRunner extends RobolectricTestRunner {
 	public WithCustomClassListTestRunner(Class<?> testClass, RobolectricConfig robolectricConfig) throws InitializationError {
 			super(testClass,
 				ShadowWrangler.getInstance(),
-				isInstrumented() ? null : new RobolectricClassLoader(ShadowWrangler.getInstance(), populateList()), 
+				isInstrumented() ? null : new RobolectricClassLoader(ShadowWrangler.getInstance(), populateList()),
 				isInstrumented() ? null : robolectricConfig);
 	}
 	

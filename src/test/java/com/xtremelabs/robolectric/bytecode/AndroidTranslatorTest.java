@@ -2,26 +2,24 @@ package com.xtremelabs.robolectric.bytecode;
 
 import android.accounts.AccountManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import com.google.android.maps.ItemizedOverlay;
-import com.google.android.maps.OverlayItem;
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
 import com.xtremelabs.robolectric.internal.Instrument;
-import com.xtremelabs.robolectric.shadows.ShadowItemizedOverlay;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
 import static com.xtremelabs.robolectric.Robolectric.directlyOn;
-import static com.xtremelabs.robolectric.RobolectricForMaps.shadowOf;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
@@ -30,7 +28,6 @@ import static org.mockito.Mockito.mock;
 
 @RunWith(WithTestDefaultsRunner.class)
 public class AndroidTranslatorTest {
-
     @Test
     public void testStaticMethodsAreDelegated() throws Exception {
         Robolectric.bindShadowClass(ShadowAccountManagerForTests.class);
@@ -43,12 +40,10 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testProtectedMethodsAreDelegated() throws Exception {
-        Robolectric.bindShadowClass(ShadowItemizedOverlay.class);
+        Robolectric.bindShadowClass(ShadowClassWithProtectedMethod.class);
 
-        ItemizedOverlayForTests overlay = new ItemizedOverlayForTests(null);
-        overlay.triggerProtectedCall();
-
-        assertThat(shadowOf(overlay).isPopulated(), is(true));
+        ClassWithProtectedMethod overlay = new ClassWithProtectedMethod();
+        assertEquals("shadow name", overlay.getName());
     }
 
     @Test
@@ -67,7 +62,7 @@ public class AndroidTranslatorTest {
     }
 
     @Test
-    public void testGeneratedDefaultConstructorIsWired() throws Exception {
+    public void whenShadowedClassHasNoDefaultConstructor_generatedDefaultConstructorShouldNotCallShadow() throws Exception {
         Robolectric.bindShadowClass(ShadowClassWithNoDefaultConstructor.class);
 
         Constructor<ClassWithNoDefaultConstructor> ctor = ClassWithNoDefaultConstructor.class.getDeclaredConstructor();
@@ -78,37 +73,41 @@ public class AndroidTranslatorTest {
     }
 
     @Test
-    public void testDirectlyOn() throws Exception {
+    public void directlyOn_shouldCallThroughToOriginalMethodBody() throws Exception {
+        Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
         View view = new View(null);
-        view.bringToFront();
 
-        Exception e = null;
         try {
-            directlyOn(view).bringToFront();
-        } catch (RuntimeException e1) {
-            e = e1;
+            view.setClickable(true);
+            fail("view.setClickable(true) should thrown an exception");
+        } catch(RuntimeException expected) {
+            assertEquals("shadow setClickable was called", expected.getMessage());
         }
-        assertNotNull(e);
-        assertEquals("Stub!", e.getMessage());
-
-        view.bringToFront();
+        try {
+            view.isClickable();
+            fail("view.isClickable() should have thrown an exception");
+        } catch(RuntimeException expected) {
+            assertEquals("shadow isClickable was called", expected.getMessage());
+        }
+        
+        directlyOn(view).setClickable(true);
+        assertTrue(directlyOn(view).isClickable());
+        directlyOn(view).setClickable(false);
+        assertFalse(directlyOn(view).isClickable());
     }
 
     @Test
     public void testDirectlyOn_Statics() throws Exception {
-        View.resolveSize(0, 0);
+        Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
 
-        Exception e = null;
         try {
-            directlyOn(View.class);
             View.resolveSize(0, 0);
-        } catch (RuntimeException e1) {
-            e = e1;
+        } catch(RuntimeException expected) {
+            assertEquals("shadow resolveSize was called", expected.getMessage());
         }
-        assertNotNull(e);
-        assertEquals("Stub!", e.getMessage());
 
-        View.resolveSize(0, 0);
+        directlyOn(View.class);
+        assertEquals(27, View.resolveSize(27, View.MeasureSpec.UNSPECIFIED));
     }
 
     @Test
@@ -130,7 +129,8 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testDirectlyOn_Statics_InstanceChecking() throws Exception {
-        TextView.getTextColors(null, null);
+        Robolectric.bindShadowClass(TextViewWithDummyGetTextColorsMethod.class);
+        assertNotNull(TextView.getTextColors(null, null)); // the real implementation would asplode
 
         Exception e = null;
         try {
@@ -139,8 +139,22 @@ public class AndroidTranslatorTest {
         } catch (RuntimeException e1) {
             e = e1;
         }
+
         assertNotNull(e);
         assertThat(e.getMessage(), equalTo("expected to perform direct call on <class android.view.View> but got <class android.widget.TextView>"));
+    }
+
+    // same test repeated twice in order to check between-test behavior
+    @Test(expected=IllegalStateException.class)
+    public void shouldClearCallDirectlyStateBeforeEachTest() throws Exception {
+        assertNull(AndroidTranslator.ALL_VARS.get().callDirectly);
+        directlyOn(View.class);
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void shouldClearCallDirectlyStateAfterEachTest() throws Exception {
+        assertNull(AndroidTranslator.ALL_VARS.get().callDirectly);
+        directlyOn(View.class);
     }
 
     @Test
@@ -164,7 +178,11 @@ public class AndroidTranslatorTest {
 
     @Test
     public void shouldDelegateToObjectHashCodeIfShadowHasNone() throws Exception {
-        assertFalse(new View(null).hashCode() == 0);
+        Robolectric.bindShadowClass(ViewWithoutHashCodeMethod.class);
+        View view = new View(null);
+
+        assertEquals(view.hashCode(), directlyOn(view).hashCode());
+        assertTrue(view.hashCode() != 0);
     }
 
     @Test
@@ -173,24 +191,33 @@ public class AndroidTranslatorTest {
         assertEquals(view, view);
     }
 
-    @Implements(ItemizedOverlay.class)
-    public static class ItemizedOverlayForTests extends ItemizedOverlay {
-        public ItemizedOverlayForTests(Drawable drawable) {
-            super(drawable);
-        }
+    @Test
+    public void shouldGenerateSeparatedConstructorBodies() throws Exception {
+        ClassWithSomeConstructors o = new ClassWithSomeConstructors("my name");
+        Method realConstructor = o.getClass().getMethod("__constructor__", String.class);
+        realConstructor.invoke(o, "my name");
+        assertEquals("my name", o.name);
+    }
 
-        @Override
-        protected OverlayItem createItem(int i) {
-            return null;
-        }
+    @Test
+    public void shouldCallOriginalConstructorBodySomehow() throws Exception {
+        Robolectric.bindShadowClass(ShadowOfClassWithSomeConstructors.class);
+        ClassWithSomeConstructors o = new ClassWithSomeConstructors("my name");
+        assertEquals("my name", o.name);
+    }
 
-        public void triggerProtectedCall() {
-            populate();
+    @Implements(ClassWithProtectedMethod.class)
+    public static class ShadowClassWithProtectedMethod {
+        @Implementation
+        protected String getName() {
+            return "shadow name";
         }
+    }
 
-        @Override
-        public int size() {
-            return 0;
+    @Instrument
+    public static class ClassWithProtectedMethod {
+        protected String getName() {
+            return "protected name";
         }
     }
 
@@ -221,6 +248,37 @@ public class AndroidTranslatorTest {
         }
     }
 
+    @Implements(View.class)
+    public static class ExceptionThrowingShadowView {
+        @Implementation
+        public void setClickable(boolean clickable) {
+            throw new RuntimeException("shadow setClickable was called");
+        }
+        @Implementation
+        public boolean isClickable() {
+            throw new RuntimeException("shadow isClickable was called");
+        }
+        @Implementation
+        public static int resolveSize(int size, int measureSpec) {
+            throw new RuntimeException("shadow resolveSize was called");
+        }
+    }
+
+    @Implements(TextView.class)
+    public static class TextViewWithDummyGetTextColorsMethod {
+        public static ColorStateList getTextColors(Context context, TypedArray attrs) {
+            return new ColorStateList(new int[0][0], new int[0]);
+        }
+    }
+
+    @Implements(View.class)
+    public static class ViewWithoutHashCodeMethod {
+    }
+
+    @Implements(ClassWithNoDefaultConstructor.class)
+    public static class ShadowClassWithNoDefaultConstructor {
+    }
+
     @Instrument
     @SuppressWarnings({"UnusedDeclaration"})
     public static class ClassWithNoDefaultConstructor {
@@ -228,7 +286,17 @@ public class AndroidTranslatorTest {
         }
     }
 
-    @Implements(ClassWithNoDefaultConstructor.class)
-    public static class ShadowClassWithNoDefaultConstructor {
+    @Instrument
+    public static class ClassWithSomeConstructors {
+        private String name;
+
+        public ClassWithSomeConstructors(String name) {
+            this.name = name;
+        }
     }
+
+    @Implements(AndroidTranslatorTest.ClassWithSomeConstructors.class)
+    public static class ShadowOfClassWithSomeConstructors {
+    }
+
 }

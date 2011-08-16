@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
+import com.xtremelabs.robolectric.internal.RealObject;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import static com.xtremelabs.robolectric.Robolectric.shadowOf;
 @SuppressWarnings({"UnusedDeclaration"})
 @Implements(ViewGroup.class)
 public class ShadowViewGroup extends ShadowView {
+    @RealObject ViewGroup viewGroup;
+
     private List<View> children = new ArrayList<View>();
 
     @Implementation

@@ -7,6 +7,7 @@ import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
+import android.app.DownloadManager;
 import android.app.KeyguardManager;
 import android.app.ListActivity;
 import android.app.Notification;
@@ -14,6 +15,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.app.UiModeManager;
 import android.appwidget.AppWidgetManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -52,7 +54,15 @@ import android.media.MediaRecorder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.*;
+import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Parcel;
+import android.os.PowerManager;
+import android.os.ResultReceiver;
+import android.os.Vibrator;
+import android.os.storage.StorageManager;
 import android.preference.DialogPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -98,6 +108,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 import android.widget.ZoomButtonsController;
+import com.xtremelabs.robolectric.bytecode.AndroidTranslator;
 import com.xtremelabs.robolectric.bytecode.RobolectricInternals;
 import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
 import com.xtremelabs.robolectric.shadows.*;
@@ -157,6 +168,13 @@ public class Robolectric {
         ShadowWrangler.getInstance().logMissingInvokedShadowMethods();
     }
 
+    /**
+     * Turns the logging of missing invoked shadow methods off again.
+     */
+    public static void silenceMissingMethodsLogger() {
+        ShadowWrangler.getInstance().silenceMissingMethodsLogger();
+    }
+
     public static List<Class<?>> getDefaultShadowClasses() {
         return Arrays.asList(
                 ShadowAbsListView.class,
@@ -212,6 +230,7 @@ public class Robolectric {
                 ShadowDateFormat.class,
                 ShadowDefaultRequestDirector.class,
                 ShadowDisplay.class,
+                ShadowDownloadManager.class,
                 ShadowDrawable.class,
                 ShadowDialog.class,
                 ShadowDialogPreference.class,
@@ -297,6 +316,7 @@ public class Robolectric {
                 ShadowSimpleCursorAdapter.class,
                 ShadowShapeDrawable.class,
                 ShadowSpannableStringBuilder.class,
+                ShadowStorageManager.class,
                 ShadowSQLiteDatabase.class,
                 ShadowSQLiteCursor.class,
                 ShadowSQLiteOpenHelper.class,
@@ -312,6 +332,7 @@ public class Robolectric {
                 ShadowToast.class,
                 ShadowTypedArray.class,
                 ShadowTypedValue.class,
+                ShadowUiModeManager.class,
                 ShadowURLSpan.class,
                 ShadowVideoView.class,
                 ShadowView.class,
@@ -326,7 +347,9 @@ public class Robolectric {
     }
 
     public static void resetStaticState() {
-        ShadowWrangler.getInstance().silence();
+        AndroidTranslator.ALL_VARS.remove();
+        ShadowWrangler shadowWrangler = ShadowWrangler.getInstance();
+        shadowWrangler.runDeferredStaticInitializers();
         Robolectric.application = new Application();
         ShadowBitmapFactory.reset();
         ShadowDrawable.reset();
@@ -351,6 +374,10 @@ public class Robolectric {
 
     public static ShadowLayerDrawable shadowOf(LayerDrawable instance) {
         return (ShadowLayerDrawable) shadowOf_(instance);
+    }
+
+    public static ShadowDownloadManager shadowOf(DownloadManager instance) {
+        return (ShadowDownloadManager) shadowOf_(instance);
     }
 
     public static ShadowService shadowOf(Service instance) {
@@ -505,6 +532,10 @@ public class Robolectric {
         return (ShadowViewGroup) shadowOf_(instance);
     }
 
+    public static ShadowVibrator shadowOf(Vibrator instance) {
+        return (ShadowVibrator) shadowOf_(instance);
+    }
+
     public static ShadowWebSettings shadowOf(WebSettings instance) {
         return (ShadowWebSettings) shadowOf_(instance);
     }
@@ -567,6 +598,14 @@ public class Robolectric {
 
     public static ShadowResources shadowOf(Resources instance) {
         return (ShadowResources) shadowOf_(instance);
+    }
+
+    public static ShadowKeyguardManager shadowOf(KeyguardManager instance) {
+        return (ShadowKeyguardManager) shadowOf_(instance);
+    }
+
+    public static ShadowStorageManager shadowOf(StorageManager instance) {
+        return (ShadowStorageManager) shadowOf_(instance);
     }
 
     public static ShadowBundle shadowOf(Bundle instance) {
@@ -741,10 +780,6 @@ public class Robolectric {
         return (ShadowPowerManager) shadowOf_(instance);
     }
 
-    public static ShadowKeyguardManager shadowOf(KeyguardManager instance) {
-        return (ShadowKeyguardManager) shadowOf_(instance);
-    }
-
     public static ShadowInputMethodManager shadowOf(InputMethodManager instance) {
         return (ShadowInputMethodManager) shadowOf_(instance);
     }
@@ -768,6 +803,10 @@ public class Robolectric {
     public static ShadowSensorManager shadowOf(SensorManager instance) {
     	return (ShadowSensorManager) shadowOf_(instance);
     }
+    
+    public static ShadowUiModeManager shadowOf(UiModeManager instance) {
+        return (ShadowUiModeManager) shadowOf_(instance);
+    }    
 
     @SuppressWarnings({"unchecked"})
     public static <P, R> P shadowOf_(R instance) {

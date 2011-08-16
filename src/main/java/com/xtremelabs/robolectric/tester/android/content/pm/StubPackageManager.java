@@ -3,9 +3,15 @@ package com.xtremelabs.robolectric.tester.android.content.pm;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.FeatureInfo;
+import android.content.pm.IPackageDataObserver;
+import android.content.pm.IPackageDeleteObserver;
+import android.content.pm.IPackageInstallObserver;
+import android.content.pm.IPackageMoveObserver;
+import android.content.pm.IPackageStatsObserver;
 import android.content.pm.InstrumentationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -17,6 +23,7 @@ import android.content.pm.ServiceInfo;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 
 import java.util.List;
 
@@ -119,6 +126,11 @@ public class StubPackageManager extends PackageManager {
 
     @Override public String getNameForUid(int uid) {
         return null;
+    }
+
+    @Override
+    public int getUidForSharedUser(String s) throws NameNotFoundException {
+        return 0;
     }
 
     @Override public List<ApplicationInfo> getInstalledApplications(int flags) {
@@ -246,8 +258,36 @@ public class StubPackageManager extends PackageManager {
         return null;
     }
 
+    @Override
+    public void installPackage(Uri uri, IPackageInstallObserver iPackageInstallObserver, int i, String s) {
+    }
+
+    @Override
+    public void deletePackage(String s, IPackageDeleteObserver iPackageDeleteObserver, int i) {
+    }
+
     @Override public String getInstallerPackageName(String packageName) {
         return null;
+    }
+
+    @Override
+    public void clearApplicationUserData(String s, IPackageDataObserver iPackageDataObserver) {
+    }
+
+    @Override
+    public void deleteApplicationCacheFiles(String s, IPackageDataObserver iPackageDataObserver) {
+    }
+
+    @Override
+    public void freeStorageAndNotify(long l, IPackageDataObserver iPackageDataObserver) {
+    }
+
+    @Override
+    public void freeStorage(long l, IntentSender intentSender) {
+    }
+
+    @Override
+    public void getPackageSizeInfo(String s, IPackageStatsObserver iPackageStatsObserver) {
     }
 
     @Override public void addPackageToPreferred(String packageName) {
@@ -262,6 +302,10 @@ public class StubPackageManager extends PackageManager {
 
     @Override
     public void addPreferredActivity(IntentFilter filter, int match, ComponentName[] set, ComponentName activity) {
+    }
+
+    @Override
+    public void replacePreferredActivity(IntentFilter intentFilter, int i, ComponentName[] componentNames, ComponentName componentName) {
     }
 
     @Override public void clearPackagePreferredActivities(String packageName) {
@@ -288,5 +332,9 @@ public class StubPackageManager extends PackageManager {
 
     @Override public boolean isSafeMode() {
         return false;
+    }
+
+    @Override
+    public void movePackage(String s, IPackageMoveObserver iPackageMoveObserver, int i) {
     }
 }

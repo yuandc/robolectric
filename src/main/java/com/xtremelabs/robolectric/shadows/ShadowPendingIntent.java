@@ -51,7 +51,7 @@ public class ShadowPendingIntent {
 
     @Implementation
     public IntentSender getIntentSender() {
-        TestIntentSender testIntentSender = new TestIntentSender();
+        TestIntentSender testIntentSender = new TestIntentSender(null);
         testIntentSender.intent = savedIntent;
         return testIntentSender;
     }
@@ -75,5 +75,27 @@ public class ShadowPendingIntent {
         shadowPendingIntent.isServiceIntent = isService;
         shadowPendingIntent.savedContext = context;
         return pendingIntent;
+    }
+
+    @Implementation
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ShadowPendingIntent that = (ShadowPendingIntent) o;
+
+        if (isServiceIntent != that.isServiceIntent) return false;
+        if (savedContext != null ? !savedContext.equals(that.savedContext) : that.savedContext != null) return false;
+        if (savedIntent != null ? !savedIntent.equals(that.savedIntent) : that.savedIntent != null) return false;
+
+        return true;
+    }
+
+    @Implementation
+    public int hashCode() {
+        int result = savedIntent != null ? savedIntent.hashCode() : 0;
+        result = 31 * result + (savedContext != null ? savedContext.hashCode() : 0);
+        result = 31 * result + (isServiceIntent ? 1 : 0);
+        return result;
     }
 }

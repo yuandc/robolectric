@@ -190,6 +190,11 @@ public class ShadowDialog {
         return window;
     }
 
+    // TODO: delete??
+    @Implementation
+    public void onCreate(Bundle savedInstanceState) {
+    }
+   
     @Implementation
     public LayoutInflater getLayoutInflater() {
         return LayoutInflater.from(realDialog.getContext());

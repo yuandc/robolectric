@@ -8,10 +8,14 @@ import com.xtremelabs.robolectric.internal.Implements;
 /**
  * Shadows the {@code android.app.KeyguardManager} class.
  */
+
 @Implements(KeyguardManager.class)
 public class ShadowKeyguardManager {
 
 	private boolean inRestrictedInputMode = false;
+
+//    public void __constructor__() {
+//    }
 	
 	@Implementation
 	public boolean inKeyguardRestrictedInputMode() {

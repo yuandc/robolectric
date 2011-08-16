@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.*;
 
 @RunWith(WithTestDefaultsRunner.class)
@@ -59,13 +60,13 @@ public class RobolectricTest {
         // There's a shadow method for this
         aView.getContext();
         String output = buff.toString();
-        assertEquals("No Shadow method found for View.<init>(android.content.Context)\n", output);
+        assertEquals("No Shadow method found for View.__constructor__(android.content.Context)\n", output);
         buff.reset();
 
         aView.findViewById(27);
         // No shadow here... should be logged
         output = buff.toString();
-        assertEquals("No Shadow method found for View.findViewById(int)\n", output);
+        assertThat(output, startsWith("No Shadow method found for View.findViewById(int)\n"));
     }
 
     @Test // This is nasty because it depends on the test above having run first in order to fail

@@ -26,6 +26,7 @@ public class WebSettingsTest {
     }
 
     @Test
+//    @Ignore // API level 8 not yet reviscerated
     public void testDefaults() {
         assertThat(webSettings.getAllowFileAccess(), equalTo(true));
         assertThat(webSettings.getBlockNetworkImage(), equalTo(false));
@@ -132,6 +133,7 @@ public class WebSettingsTest {
     }
 
     @Test
+//    @Ignore // API level 8 not yet reviscerated
     public void testPluginState() {
         WebSettings.PluginState[] states = {
                 WebSettings.PluginState.OFF,

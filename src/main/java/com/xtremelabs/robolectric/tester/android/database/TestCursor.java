@@ -8,6 +8,8 @@ import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
 
+import java.util.Map;
+
 public class TestCursor implements Cursor {
     @Override
     public int getCount() {
@@ -66,6 +68,11 @@ public class TestCursor implements Cursor {
 
     @Override
     public boolean isAfterLast() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean deleteRow() {
         throw new UnsupportedOperationException();
     }
 
@@ -136,6 +143,71 @@ public class TestCursor implements Cursor {
 
     @Override
     public boolean isNull(int columnIndex) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean supportsUpdates() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean hasUpdates() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateBlob(int i, byte[] bytes) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateString(int i, String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateShort(int i, short s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateInt(int i, int i1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateLong(int i, long l) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateFloat(int i, float v) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateDouble(int i, double v) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean updateToNull(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean commitUpdates() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean commitUpdates(Map<? extends Long, ? extends Map<String, Object>> map) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void abortUpdates() {
         throw new UnsupportedOperationException();
     }
 

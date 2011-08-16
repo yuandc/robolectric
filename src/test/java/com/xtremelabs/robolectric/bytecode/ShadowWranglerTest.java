@@ -1,5 +1,6 @@
 package com.xtremelabs.robolectric.bytecode;
 
+import com.google.android.maps.MapActivity;
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithoutTestDefaultsRunner;
 import com.xtremelabs.robolectric.internal.Implements;
@@ -12,6 +13,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.not;
@@ -21,10 +23,30 @@ import static org.junit.Assert.*;
 @RunWith(WithoutTestDefaultsRunner.class)
 public class ShadowWranglerTest {
     private String name;
+    private ShadowWrangler testShadowWrangler;
 
     @Before
     public void setUp() throws Exception {
         name = "context";
+        // in case they haven't been run yet by another TestRunner
+        ShadowWrangler.getInstance().runDeferredStaticInitializers();
+
+        testShadowWrangler = ShadowWrangler.newShadowWranglerForTest();
+    }
+
+    @Test
+    public void whenClassIsUnshadowed_shouldPerformStaticInitialization() throws Exception {
+        assertEquals("Hank", UnshadowedClassWithStaticInitializer.name);
+    }
+
+    @Test
+    public void whenClassIsShadowed_shouldBlockStaticInitialization() throws Exception {
+        Robolectric.bindShadowClass(ShadowClassWithStaticInitializer.class);
+
+        assertEquals(null, ClassWithStaticInitializer.name);
+
+        AndroidTranslator.performStaticInitialization(ClassWithStaticInitializer.class);
+        assertEquals("Floyd", ClassWithStaticInitializer.name);
     }
 
     @Test
@@ -147,6 +169,37 @@ public class ShadowWranglerTest {
         assertThat(stackTrace, not(containsString(RobolectricInternals.class.getName() + ".")));
     }
 
+    @Test
+    public void shouldIdentifyShadowClasses() throws Exception {
+
+        Class<ShadowClassWithStaticInitializer> shadowClass = ShadowClassWithStaticInitializer.class;
+        Class<ClassWithStaticInitializer> unshadowedClass = ClassWithStaticInitializer.class;
+
+        assertTrue(ShadowWrangler.isShadowClass(shadowClass));
+        assertFalse(ShadowWrangler.isShadowClass(unshadowedClass));
+    }
+
+    @Test
+    public void shouldKnowMapsClassesAreStubbed() throws Exception {
+        assertTrue(testShadowWrangler.classIsStubbed(MapActivity.class));
+    }
+
+    @Test
+    public void stubbedPackageList_ShouldContainMapsPackage() throws Exception {
+        List<String> stubbedPackageList = testShadowWrangler.getStubbedPackages();
+        assertTrue(stubbedPackageList.contains("com.google.android.maps"));
+    }
+
+    @Test
+    public void shouldAllowStubbedPackageListToBeChanged() throws Exception {
+        List<String> stubbedPackageList = testShadowWrangler.getStubbedPackages();
+        stubbedPackageList.remove("com.google.android.maps");
+        assertFalse(testShadowWrangler.classIsStubbed(MapActivity.class));
+    }
+    public static boolean isShadowClass(Class<?> shadowClass) {
+        return shadowClass.getAnnotation(Implements.class) != null;
+    }
+
     private ShadowFoo shadowOf(Foo foo) {
         return (ShadowFoo) Robolectric.shadowOf_(foo);
     }
@@ -209,6 +262,25 @@ public class ShadowWranglerTest {
         @SuppressWarnings({"UnusedDeclaration"})
         public String getName() throws IOException {
             throw new IOException("fake exception");
+        }
+    }
+
+    @Instrument
+    public static class UnshadowedClassWithStaticInitializer {
+        static String name = "Hank";
+    }
+
+    @Instrument
+    public static class ClassWithStaticInitializer {
+        static String name = "Floyd";
+    }
+
+    @Implements(ClassWithStaticInitializer.class)
+    public static class ShadowClassWithStaticInitializer {
+        public static boolean hasBeenStaticallyInitialized = false;
+
+        public static void __staticInitializer__() {
+            hasBeenStaticallyInitialized = true;
         }
     }
 }

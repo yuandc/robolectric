@@ -312,6 +312,10 @@ public class ShadowActivity extends ShadowContextWrapper {
         getApplicationContext().startActivity(intent);
     }
 
+    @Implementation
+    public void onCreate(Bundle savedInstanceState) {
+    }
+
     public void receiveResult(Intent requestIntent, int resultCode, Intent resultIntent) {
         Integer requestCode = intentRequestCodeMap.get(requestIntent);
         if (requestCode == null) {

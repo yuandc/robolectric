@@ -279,6 +279,23 @@ public class ActivityTest {
         int id = activity.getResources().getIdentifier("just_alot_of_crap", "string", "com.xtremelabs.robolectric");
         assertTrue(id == 0);
     }
+    
+   @Test
+    public void shouldNotThrowNPEInOnCreate() throws Exception {
+        MyActivity myActivity = new MyActivity();
+        myActivity.onCreate(new Bundle());
+        assertNotNull(myActivity);
+    }
+
+    private static class MyActivity extends Activity {
+        @Override protected void onDestroy() {
+            super.onDestroy();
+        }
+
+        @Override protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+        }
+    }
 
     private static class DialogCreatingActivity extends Activity {
         @Override

@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TextView;
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,10 +30,10 @@ public class TabHostTest {
     public void shouldAddTabsToLayoutWhenAddedToHost() {
         TabHost tabHost = new TabHost(null);
 
-        View fooView = new View(null);
+        View fooView = new View(Robolectric.application);
         TabHost.TabSpec foo = tabHost.newTabSpec("Foo").setIndicator(fooView);
 
-        View barView = new View(null);
+        View barView = new View(Robolectric.application);
         TabHost.TabSpec bar = tabHost.newTabSpec("Bar").setIndicator(barView);
 
         tabHost.addTab(foo);

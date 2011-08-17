@@ -9,6 +9,7 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TextView;
 import com.xtremelabs.robolectric.R;
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,7 @@ public class TabSpecTest {
     @Test
     public void shouldGetAndSetTheIndicator() throws Exception {
         TabHost.TabSpec spec = new TabHost(null).newTabSpec("foo");
-        View view = new View(null);
+        View view = new View(Robolectric.application);
         TabHost.TabSpec self = spec.setIndicator(view);
         assertThat(self, is(spec));
         assertThat(shadowOf(spec).getIndicatorAsView(), is(view));

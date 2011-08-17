@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.RobolectricTestRunner;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -33,37 +34,43 @@ public class SensorManagerTest {
 		sensorManager = null;
 		shadow = null;
 	}
-	
-	@Test
-	public void shouldReturnHasListenerAfterRegisteringListener() {
-		SensorEventListener listener = registerListener();
 
-		assertTrue(shadow.hasListener(listener));
-	}
-	
-	private SensorEventListener registerListener() {
-		SensorEventListener listener = new TestSensorEventListener();
-		Sensor sensor = sensorManager.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER);
-		sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
-		
-		return listener;
-	}
-	
+    @Test
+    public void shouldReturnHasListenerAfterRegisteringListener() {
+        if (RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) {
+            System.out.println("Incompatible with Real Android Jars");
+        }
+        SensorEventListener listener = registerListener();
+
+        assertTrue(shadow.hasListener(listener));
+    }
+
 	@Test
 	public void shouldReturnHasNoListenerAfterUnregisterListener() {
+        if (RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) {
+            System.out.println("Incompatible with Real Android Jars");
+        }
 		SensorEventListener listener = registerListener();
-		sensorManager.unregisterListener(listener, sensorManager.getDefaultSensor(SensorManager.SENSOR_ACCELEROMETER));
-		
+		sensorManager.unregisterListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+
 		assertFalse(shadow.hasListener(listener));
 	}
-	
+
 	@Test
 	public void shouldReturnHasNoListenerByDefault() {
 		SensorEventListener listener = new TestSensorEventListener();
-		
+
 		assertFalse(shadow.hasListener(listener));
 	}
-	
+
+    private SensorEventListener registerListener() {
+        SensorEventListener listener = new TestSensorEventListener();
+        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(listener, sensor, SensorManager.SENSOR_DELAY_NORMAL);
+
+        return listener;
+    }
+
 	private class TestSensorEventListener implements SensorEventListener {
 
 		@Override

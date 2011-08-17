@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import com.xtremelabs.robolectric.Robolectric;
+import com.xtremelabs.robolectric.RobolectricTestRunner;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
@@ -73,30 +74,6 @@ public class AndroidTranslatorTest {
     }
 
     @Test
-    public void directlyOn_shouldCallThroughToOriginalMethodBody() throws Exception {
-        Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
-        View view = new View(null);
-
-        try {
-            view.setClickable(true);
-            fail("view.setClickable(true) should thrown an exception");
-        } catch(RuntimeException expected) {
-            assertEquals("shadow setClickable was called", expected.getMessage());
-        }
-        try {
-            view.isClickable();
-            fail("view.isClickable() should have thrown an exception");
-        } catch(RuntimeException expected) {
-            assertEquals("shadow isClickable was called", expected.getMessage());
-        }
-        
-        directlyOn(view).setClickable(true);
-        assertTrue(directlyOn(view).isClickable());
-        directlyOn(view).setClickable(false);
-        assertFalse(directlyOn(view).isClickable());
-    }
-
-    @Test
     public void testDirectlyOn_Statics() throws Exception {
         Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
 
@@ -112,8 +89,8 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testDirectlyOn_InstanceChecking() throws Exception {
-        View view1 = new View(null);
-        View view2 = new View(null);
+        View view1 = new View(Robolectric.application);
+        View view2 = new View(Robolectric.application);
 
         Exception e = null;
         try {
@@ -173,13 +150,13 @@ public class AndroidTranslatorTest {
 
     @Test
     public void shouldDelegateToObjectToStringIfShadowHasNone() throws Exception {
-        assertTrue(new View(null).toString().startsWith("android.view.View@"));
+        assertTrue(new View(Robolectric.application).toString().startsWith("android.view.View@"));
     }
 
     @Test
     public void shouldDelegateToObjectHashCodeIfShadowHasNone() throws Exception {
         Robolectric.bindShadowClass(ViewWithoutHashCodeMethod.class);
-        View view = new View(null);
+        View view = new View(Robolectric.application);
 
         assertEquals(view.hashCode(), directlyOn(view).hashCode());
         assertTrue(view.hashCode() != 0);
@@ -187,12 +164,39 @@ public class AndroidTranslatorTest {
 
     @Test
     public void shouldDelegateToObjectEqualsIfShadowHasNone() throws Exception {
-        View view = new View(null);
+        View view = new View(Robolectric.application);
         assertEquals(view, view);
     }
 
     @Test
-    public void shouldGenerateSeparatedConstructorBodies() throws Exception {
+    public void whenUsingRealAndroidSources_directlyOn_shouldCallThroughToOriginalMethodBody() throws Exception {
+        if (!RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) return;
+
+        Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
+        View view = new View(Robolectric.application);
+
+        try {
+            view.setClickable(true);
+            fail("view.setClickable(true) should thrown an exception");
+        } catch(RuntimeException expected) {
+            assertEquals("shadow setClickable was called", expected.getMessage());
+        }
+        try {
+            view.isClickable();
+            fail("view.isClickable() should have thrown an exception");
+        } catch(RuntimeException expected) {
+            assertEquals("shadow isClickable was called", expected.getMessage());
+        }
+
+        directlyOn(view).setClickable(true);
+        assertTrue(directlyOn(view).isClickable());
+        directlyOn(view).setClickable(false);
+        assertFalse(directlyOn(view).isClickable());
+    }
+
+    @Test
+    public void whenUsingRealAndroidSources_shouldGenerateSeparatedConstructorBodies() throws Exception {
+        if (!RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) return;
         ClassWithSomeConstructors o = new ClassWithSomeConstructors("my name");
         Method realConstructor = o.getClass().getMethod("__constructor__", String.class);
         realConstructor.invoke(o, "my name");
@@ -200,7 +204,8 @@ public class AndroidTranslatorTest {
     }
 
     @Test
-    public void shouldCallOriginalConstructorBodySomehow() throws Exception {
+    public void whenUsingRealAndroidSources_shouldCallOriginalConstructorBodySomehow() throws Exception {
+        if (!RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) return;
         Robolectric.bindShadowClass(ShadowOfClassWithSomeConstructors.class);
         ClassWithSomeConstructors o = new ClassWithSomeConstructors("my name");
         assertEquals("my name", o.name);

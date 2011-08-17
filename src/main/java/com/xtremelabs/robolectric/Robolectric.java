@@ -334,6 +334,7 @@ public class Robolectric {
                 ShadowTypedValue.class,
                 ShadowUiModeManager.class,
                 ShadowURLSpan.class,
+                ShadowVibrator.class,
                 ShadowVideoView.class,
                 ShadowView.class,
                 ShadowViewGroup.class,

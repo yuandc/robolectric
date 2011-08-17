@@ -15,21 +15,21 @@ public class TemporaryBindingsTest {
 
     @Test
     public void overridingShadowBindingsShouldNotAffectBindingsInLaterTests() throws Exception {
-        assertThat(shadowOf(new View(null)).getClass().getSimpleName(), equalTo(ShadowView.class.getSimpleName()));
+        assertThat(shadowOf(new View(Robolectric.application)).getClass().getSimpleName(), equalTo(ShadowView.class.getSimpleName()));
 
         Robolectric.bindShadowClass(TemporaryShadowView.class);
 
-        assertThat(Robolectric.shadowOf_(new View(null)).getClass().getSimpleName(),
+        assertThat(Robolectric.shadowOf_(new View(Robolectric.application)).getClass().getSimpleName(),
                 equalTo(TemporaryShadowView.class.getSimpleName()));
     }
 
     @Test
     public void overridingShadowBindingsShouldNotAffectBindingsInLaterTestsAgain() throws Exception {
-        assertThat(shadowOf(new View(null)).getClass().getSimpleName(), equalTo(ShadowView.class.getSimpleName()));
+        assertThat(shadowOf(new View(Robolectric.application)).getClass().getSimpleName(), equalTo(ShadowView.class.getSimpleName()));
 
         Robolectric.bindShadowClass(TemporaryShadowView.class);
 
-        assertThat(Robolectric.shadowOf_(new View(null)).getClass().getSimpleName(),
+        assertThat(Robolectric.shadowOf_(new View(Robolectric.application)).getClass().getSimpleName(),
                 equalTo(TemporaryShadowView.class.getSimpleName()));
     }
 

@@ -130,7 +130,7 @@ public class AndroidTranslator implements Translator {
                         || ctClass.hasAnnotation(Instrument.class);
 
         if (ctClass.hasAnnotation(Instrument.class)) {
-            System.out.println("ctClass = " + ctClass);
+//            System.out.println("ctClass = " + ctClass);
         }
 
         if (!wantsToBeInstrumented) {

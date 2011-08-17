@@ -215,7 +215,7 @@ public class ViewTest {
 
     @Test
     public void shouldSupportAllConstructors() throws Exception {
-        new View(null);
+        new View(Robolectric.application);
         new View(null, null);
         new View(null, null, 0);
     }

@@ -6,16 +6,12 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.IContentProvider;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.IBinder;
 import android.os.Looper;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 import com.xtremelabs.robolectric.Robolectric;
@@ -128,7 +124,7 @@ public class ShadowApplication extends ShadowContextWrapper {
     @Override @Implementation
     public Resources getResources() {
         if (resources == null) {
-            resources = ShadowResources.bind(new Resources(new AssetManager(), new DisplayMetrics(), new Configuration()), resourceLoader);
+            resources = ShadowResources.bind(new Resources(null, null, null), resourceLoader);
         }
         return resources;
     }
@@ -136,17 +132,7 @@ public class ShadowApplication extends ShadowContextWrapper {
     @Implementation
     @Override public ContentResolver getContentResolver() {
         if (contentResolver == null) {
-            contentResolver = new ContentResolver(realApplication) {
-                @Override
-                protected IContentProvider acquireProvider(Context context, String s) {
-                    return null;
-                }
-
-                @Override
-                public boolean releaseProvider(IContentProvider iContentProvider) {
-                    return false;
-                }
-            };
+            contentResolver = new ContentResolver(realApplication) { };
         }
         return contentResolver;
     }

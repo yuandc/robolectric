@@ -53,7 +53,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     private static RobolectricClassLoader getDefaultLoader() {
         if (defaultLoader == null) {
             if (USE_REAL_ANDROID_SOURCES) {
-                String androidSourcesPrefix = "file:///Users/pivotal/android-real-jars/gingerbread";
+                String androidSourcesPrefix = "file:///Users/pivotal/android-real-jars/gingerbread-233";
                 URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
                         parseUrl("file:///Users/pivotal/android-sdk-mac_x86/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
                         parseUrl(androidSourcesPrefix + "/classes.jar"),

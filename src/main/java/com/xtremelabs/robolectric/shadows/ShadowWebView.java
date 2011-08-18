@@ -62,7 +62,6 @@ public class ShadowWebView extends ShadowAbsoluteLayout {
         webChromeClient = client;
     }
 
-    @Implementation
     public WebViewClient getWebViewClient() {
         return webViewClient;
     }
@@ -136,7 +135,6 @@ public class ShadowWebView extends ShadowAbsoluteLayout {
     	return runFlag;
     }
 
-    @Implementation
     public WebChromeClient getWebChromeClient() {
         return webChromeClient;
     }

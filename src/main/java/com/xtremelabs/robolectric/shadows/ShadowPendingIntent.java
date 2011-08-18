@@ -51,7 +51,7 @@ public class ShadowPendingIntent {
 
     @Implementation
     public IntentSender getIntentSender() {
-        TestIntentSender testIntentSender = new TestIntentSender();
+        TestIntentSender testIntentSender = new TestIntentSender(null);
         testIntentSender.intent = savedIntent;
         return testIntentSender;
     }

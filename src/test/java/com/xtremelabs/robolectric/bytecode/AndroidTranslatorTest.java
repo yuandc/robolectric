@@ -74,6 +74,20 @@ public class AndroidTranslatorTest {
     }
 
     @Test
+    public void testDirectlyOn_Statics() throws Exception {
+        Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
+
+        try {
+            View.resolveSize(0, 0);
+        } catch(RuntimeException expected) {
+            assertEquals("shadow resolveSize was called", expected.getMessage());
+        }
+
+        directlyOn(View.class);
+        assertEquals(27, View.resolveSize(27, View.MeasureSpec.UNSPECIFIED));
+    }
+
+    @Test
     public void testDirectlyOn_InstanceChecking() throws Exception {
         View view1 = new View(Robolectric.application);
         View view2 = new View(Robolectric.application);
@@ -152,22 +166,6 @@ public class AndroidTranslatorTest {
     public void shouldDelegateToObjectEqualsIfShadowHasNone() throws Exception {
         View view = new View(Robolectric.application);
         assertEquals(view, view);
-    }
-
-    @Test
-    public void whenUsingRealAndroidSources_directlyOn_ShouldCallThroughToOriginalStaticMethodBody() throws Exception {
-        if (!RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) return;
-        Robolectric.bindShadowClass(ExceptionThrowingShadowView.class);
-
-        try {
-            View.resolveSize(0, 0);
-            fail("expecting View.resolveSize(0, 0) should have thrown a RuntimeException but it did not.");
-        } catch(RuntimeException expected) {
-            assertEquals("shadow resolveSize was called", expected.getMessage());
-        }
-
-        directlyOn(View.class);
-        assertEquals(27, View.resolveSize(27, View.MeasureSpec.UNSPECIFIED));
     }
 
     @Test

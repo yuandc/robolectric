@@ -85,7 +85,8 @@ public class ShadowRatingBar extends ShadowAbsSeekBar {
         return (float) getNumStars() / getMax();
     }
     
-    private float getProgressPerStar() {
+    @Implementation
+    public float getProgressPerStar() {
         if (mNumStars > 0) {
             return 1f * getMax() / mNumStars;
         } else {

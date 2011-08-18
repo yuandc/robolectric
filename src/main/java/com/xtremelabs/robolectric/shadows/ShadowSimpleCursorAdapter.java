@@ -323,7 +323,8 @@ public class ShadowSimpleCursorAdapter extends ShadowResourceCursorAdapter {
      * @param from the Strings naming the columns of interest
      */
 
-    private void findColumns(String[] from) {
+    @Implementation
+    public void findColumns(String[] from) {
         if (mCursor != null) {
             int i;
             int count = from.length;

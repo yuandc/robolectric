@@ -70,7 +70,8 @@ public class ShadowArrayAdapter<T> extends ShadowBaseAdapter {
         init(context, resource, textViewResourceId, objects);
     }
 
-    private void init(Context context, int resource, int textViewResourceId, List<T> objects) {
+    @Implementation
+    public void init(Context context, int resource, int textViewResourceId, List<T> objects) {
         this.context = context;
         this.list = objects;
         this.resource = resource;

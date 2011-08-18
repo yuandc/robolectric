@@ -53,24 +53,23 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     private static RobolectricClassLoader getDefaultLoader() {
         if (defaultLoader == null) {
             if (USE_REAL_ANDROID_SOURCES) {
-                String androidSourcesPrefix = "file:///Users/pivotal/android-real-jars/gingerbread";
-                URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
-                        parseUrl("file:///Users/pivotal/android-sdk-mac_x86/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
-                        parseUrl(androidSourcesPrefix + "/classes.jar"),
-                        parseUrl(androidSourcesPrefix + "/kxml2-2.3.0.jar")
-                }, null);
-//                String androidSourcesPrefix = "file:///Volumes/Android9Source";
-//                URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
-//                        parseUrl("file:///Users/pivotal/android/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
-//                        parseUrl(androidSourcesPrefix + "/out/target/common/obj/JAVA_LIBRARIES/framework_intermediates/classes.jar"),
-//                        parseUrl(androidSourcesPrefix + "/prebuilt/common/kxml2/kxml2-2.3.0.jar")
-//                }, null);
-                defaultLoader = new RobolectricClassLoader(realAndroidJarsClassLoader, ShadowWrangler.getInstance());
+                defaultLoader = getRealAndroidSourcesClassLoader();
             } else {
                 defaultLoader = new RobolectricClassLoader(ShadowWrangler.getInstance());
             }
         }
         return defaultLoader;
+    }
+
+    protected static RobolectricClassLoader getRealAndroidSourcesClassLoader() {
+        String androidSourcesPrefix = "file:///Users/pivotal/android-real-jars/gingerbread-233";
+        URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
+                parseUrl("file:///Users/pivotal/android-sdk-mac_x86/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
+                parseUrl(androidSourcesPrefix + "/classes.jar"),
+                parseUrl(androidSourcesPrefix + "/kxml2-2.3.0.jar")
+        }, null);
+
+        return new RobolectricClassLoader(realAndroidJarsClassLoader, ShadowWrangler.getInstance());
     }
 
     private static URL parseUrl(String url) {

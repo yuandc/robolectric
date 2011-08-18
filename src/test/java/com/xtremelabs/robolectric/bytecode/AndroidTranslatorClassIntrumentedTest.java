@@ -1,18 +1,16 @@
 package com.xtremelabs.robolectric.bytecode;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import android.graphics.Paint;
-
 import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.WithCustomClassListTestRunner;
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 @RunWith(WithCustomClassListTestRunner.class)
 public class AndroidTranslatorClassIntrumentedTest {
@@ -67,7 +65,7 @@ public class AndroidTranslatorClassIntrumentedTest {
             return color;
         }
     }
-    
+
     @SuppressWarnings({"UnusedDeclaration"})
     public static class CustomPaint extends Paint {
     	private int customColor;

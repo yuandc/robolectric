@@ -26,7 +26,6 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.SimpleCursorAdapter.CursorToStringConverter;
 import android.widget.SimpleCursorAdapter.ViewBinder;
 import android.widget.TextView;
-
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
 import com.xtremelabs.robolectric.internal.RealObject;
@@ -323,8 +322,7 @@ public class ShadowSimpleCursorAdapter extends ShadowResourceCursorAdapter {
      * @param from the Strings naming the columns of interest
      */
 
-    @Implementation
-    public void findColumns(String[] from) {
+    private void findColumns(String[] from) {
         if (mCursor != null) {
             int i;
             int count = from.length;

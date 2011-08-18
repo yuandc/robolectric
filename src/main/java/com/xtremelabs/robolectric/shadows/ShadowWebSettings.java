@@ -112,7 +112,6 @@ public class ShadowWebSettings {
         loadWithOverviewMode = flag;
     }
 
-    @Implementation
     public boolean getNeedInitialFocus() {
         return needInitialFocus;
     }

@@ -18,10 +18,6 @@ public class RobolectricClassLoader extends javassist.Loader {
         this(RobolectricClassLoader.class.getClassLoader(), classHandler);
     }
 
-    public RobolectricClassLoader(ClassHandler classHandler, ArrayList<String> customClassNames) {
-        this(RobolectricClassLoader.class.getClassLoader(), classHandler, customClassNames);
-    }
-
     public RobolectricClassLoader(ClassLoader classLoader, ClassHandler classHandler) {
         this(classLoader, classHandler, new ArrayList<String>());
     }

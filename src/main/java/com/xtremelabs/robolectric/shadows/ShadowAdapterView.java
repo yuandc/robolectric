@@ -81,8 +81,7 @@ public class ShadowAdapterView extends ShadowViewGroup {
         });
     }
 
-    @Implementation
-    public void updateEmptyStatus(boolean empty) {
+    private void updateEmptyStatus(boolean empty) {
         // code taken from the real AdapterView and commented out where not (yet?) applicable
 
         // we don't deal with filterMode yet...

@@ -18,11 +18,19 @@ public class WithCustomClassListTestRunner extends RobolectricTestRunner {
 	public WithCustomClassListTestRunner(Class<?> testClass, RobolectricConfig robolectricConfig) throws InitializationError {
 			super(testClass,
 				ShadowWrangler.getInstance(),
-				isInstrumented() ? null : new RobolectricClassLoader(ShadowWrangler.getInstance(), populateList()),
+				isInstrumented() ? null : getClassLoader(),
 				isInstrumented() ? null : robolectricConfig);
 	}
-	
-	private static ArrayList<String> populateList() {
+
+    private static RobolectricClassLoader getClassLoader() {
+        if (USE_REAL_ANDROID_SOURCES) {
+            return new RobolectricClassLoader(getRealAndroidSourcesClassLoader(), ShadowWrangler.getInstance(), populateList());
+        } else {
+            return new RobolectricClassLoader(RobolectricClassLoader.class.getClassLoader(), ShadowWrangler.getInstance(), populateList());
+        }
+    }
+
+    private static ArrayList<String> populateList() {
 		ArrayList<String> testList = new ArrayList<String>();
 		testList.add("com.xtremelabs.robolectric.bytecode.AndroidTranslatorClassIntrumentedTest$CustomPaint");
 		return testList;

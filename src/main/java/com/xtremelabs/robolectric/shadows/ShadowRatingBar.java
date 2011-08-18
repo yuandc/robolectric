@@ -1,7 +1,6 @@
 package com.xtremelabs.robolectric.shadows;
 
 import android.widget.RatingBar;
-
 import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
 
@@ -85,8 +84,7 @@ public class ShadowRatingBar extends ShadowAbsSeekBar {
         return (float) getNumStars() / getMax();
     }
     
-    @Implementation
-    public float getProgressPerStar() {
+    private float getProgressPerStar() {
         if (mNumStars > 0) {
             return 1f * getMax() / mNumStars;
         } else {

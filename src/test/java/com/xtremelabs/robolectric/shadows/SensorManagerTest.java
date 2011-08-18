@@ -38,7 +38,8 @@ public class SensorManagerTest {
     @Test
     public void shouldReturnHasListenerAfterRegisteringListener() {
         if (RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) {
-            System.out.println("Incompatible with Real Android Jars");
+            System.out.println(getClass().getCanonicalName() + ".shouldReturnHasListenerAfterRegisteringListener: Incompatible with Real Android Jars right now");
+            return;
         }
         SensorEventListener listener = registerListener();
 
@@ -48,7 +49,8 @@ public class SensorManagerTest {
 	@Test
 	public void shouldReturnHasNoListenerAfterUnregisterListener() {
         if (RobolectricTestRunner.USE_REAL_ANDROID_SOURCES) {
-            System.out.println("Incompatible with Real Android Jars");
+            System.out.println(getClass().getCanonicalName() + ".shouldReturnHasNoListenerAfterUnregisterListener: Incompatible with Real Android Jars right now.");
+            return;
         }
 		SensorEventListener listener = registerListener();
 		sensorManager.unregisterListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));

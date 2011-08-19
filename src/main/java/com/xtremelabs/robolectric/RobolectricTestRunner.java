@@ -40,7 +40,9 @@ import java.util.Map;
 public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements RobolectricTestRunnerInterface {
     private static RobolectricClassLoader defaultLoader;
     private static Map<RobolectricConfig, ResourceLoader> resourceLoaderForRootAndDirectory = new HashMap<RobolectricConfig, ResourceLoader>();
-    public static final boolean USE_REAL_ANDROID_SOURCES = false;
+    public static final boolean USE_REAL_ANDROID_SOURCES = true;
+    public static final String DEFAULT_REAL_ANDROID_JARS_PATH = "/Users/pivotal/android-real-jars/gingerbread-233";
+    public static final String DEFAULT_ANDROID_HOME = "/Users/pivotal/android-sdk-mac_x86";
 
     // fields in the RobolectricTestRunner in the original ClassLoader
     private RobolectricClassLoader classLoader;
@@ -62,14 +64,40 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner implements Rob
     }
 
     protected static RobolectricClassLoader getRealAndroidSourcesClassLoader() {
-        String androidSourcesPrefix = "file:///Users/pivotal/android-real-jars/gingerbread-233";
+        String androidSourcesPrefix = getRealAndroidJarPathPrefix();
         URLClassLoader realAndroidJarsClassLoader = new URLClassLoader(new URL[]{
-                parseUrl("file:///Users/pivotal/android-sdk-mac_x86/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
+                parseUrl(getAndroidSdkHome() + "/add-ons/addon_google_apis_google_inc_8/libs/maps.jar"),
                 parseUrl(androidSourcesPrefix + "/classes.jar"),
                 parseUrl(androidSourcesPrefix + "/kxml2-2.3.0.jar")
         }, null);
 
         return new RobolectricClassLoader(realAndroidJarsClassLoader, ShadowWrangler.getInstance());
+    }
+
+    private static String getRealAndroidJarPathPrefix() {
+        String pathPrefix = getAndroidRealJarsHomePathFromSystemEnvironment();
+        if (pathPrefix == null) {
+            pathPrefix = DEFAULT_REAL_ANDROID_JARS_PATH;
+        }
+        return "file://" + pathPrefix;
+    }
+
+    private static String getAndroidRealJarsHomePathFromSystemEnvironment() {
+        // Hand tested
+        return System.getenv().get("ANDROID_REAL_JARS_HOME");
+    }
+
+    private static String getAndroidSdkHome() {
+        String pathPrefix = getAndroidHomePathFromSystemEnvironment();
+        if (pathPrefix == null) {
+            pathPrefix = DEFAULT_ANDROID_HOME;
+        }
+        return "file://" + pathPrefix;
+    }
+
+    private static String getAndroidHomePathFromSystemEnvironment() {
+        // Hand tested
+        return System.getenv().get("ANDROID_HOME");
     }
 
     private static URL parseUrl(String url) {

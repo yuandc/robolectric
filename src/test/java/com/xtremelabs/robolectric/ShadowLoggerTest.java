@@ -1,7 +1,7 @@
 package com.xtremelabs.robolectric;
 
 import android.util.Log;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -9,6 +9,11 @@ import static junit.framework.Assert.assertEquals;
 
 @RunWith(WithTestDefaultsRunner.class)
 public class ShadowLoggerTest {
+    @Before
+    public void setup() {
+        ShadowLogger.reset();
+    }
+
     @Test
     public void d_shouldLogAppropriately() {
         Log.d("tag", "msg");
@@ -103,11 +108,6 @@ public class ShadowLoggerTest {
         Log.wtf("tag", "msg", throwable);
 
         assertLogged(ShadowLogger.LogType.wtf, "tag", "msg", throwable);
-    }
-
-    @After
-    public void tearDown() {
-        ShadowLogger.reset();
     }
 
     private void assertLogged(ShadowLogger.LogType type, String tag, String msg, Throwable throwable) {

@@ -23,8 +23,12 @@ import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.shadows.ShadowContextWrapper;
 import com.xtremelabs.robolectric.util.I18nException;
 import com.xtremelabs.robolectric.util.PropertiesHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ResourceLoader {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Robolectric.class);
+
 	private static final FileFilter MENU_DIR_FILE_FILTER = new FileFilter() {
 		@Override
 		public boolean accept( File file ) {
@@ -314,7 +318,7 @@ public class ResourceLoader {
 			return resourcePath;
 		}
 
-		System.out.println( "WARNING: Unable to find path to Android SDK" );
+		LOGGER.warn("WARNING: Unable to find path to Android SDK");
 		return null;
 	}
 

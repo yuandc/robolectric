@@ -1,8 +1,11 @@
 package com.xtremelabs.robolectric.bytecode;
 
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.bytecode.DirectCallPolicy.DirectCallException;
 import com.xtremelabs.robolectric.bytecode.DirectCallPolicy.FullStackDirectCallPolicy;
 import com.xtremelabs.robolectric.internal.Implements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -11,6 +14,8 @@ import java.util.Set;
 
 @SuppressWarnings({"UnusedDeclaration"})
 public class RobolectricInternals {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Robolectric.class);
+
     // initialized via magic by AndroidTranslator
     private static ClassHandler classHandler;
     private static Set<String> unloadableClassNames = new HashSet<String>();
@@ -70,7 +75,7 @@ public class RobolectricInternals {
             if (isIgnorableClassLoadingException(typeLoadingException)) {
                 //this allows users of the robolectric.jar file to use the non-Google APIs version of the api
                 if (unloadableClassNames.add(unloadableClassName)) {
-                    System.out.println("Warning: an error occurred while binding shadow class: " + unloadableClassName);
+                    LOGGER.warn("an error occurred while binding shadow class " + unloadableClassName, typeLoadingException);
                 }
             } else {
                 throw typeLoadingException;

@@ -18,14 +18,10 @@ package com.xtremelabs.robolectric.shadows;
 
 import android.util.SparseArray;
 import com.xtremelabs.robolectric.WithTestDefaultsRunner;
-import com.xtremelabs.robolectric.bytecode.ShadowWrangler;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Tests for shadow implementation of SparseArray. Basically copied & pasted the
@@ -44,7 +40,6 @@ public class SparseArrayTest {
 
     @Test
     public void testSparseArrayWithDefaultCapacity() {
-        ShadowWrangler.getInstance().logMissingInvokedShadowMethods();
         SparseArray<Integer> sparseArray = new SparseArray<Integer>();
         assertEquals(0, sparseArray.size());
 

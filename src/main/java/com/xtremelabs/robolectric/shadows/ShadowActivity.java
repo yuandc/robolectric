@@ -17,6 +17,8 @@ import com.xtremelabs.robolectric.internal.Implementation;
 import com.xtremelabs.robolectric.internal.Implements;
 import com.xtremelabs.robolectric.internal.RealObject;
 import com.xtremelabs.robolectric.tester.android.view.TestWindow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -25,13 +27,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-//import javassist.bytecode.Mnemonic;
-
 import static com.xtremelabs.robolectric.Robolectric.shadowOf;
+
+//import javassist.bytecode.Mnemonic;
 
 
 @Implements(Activity.class)
 public class ShadowActivity extends ShadowContextWrapper {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShadowActivity.class);
+
     @RealObject
     protected Activity realActivity;
 
@@ -179,7 +183,7 @@ public class ShadowActivity extends ShadowContextWrapper {
         if (contentView != null) {
             return contentView.findViewById(id);
         } else {
-            System.out.println("WARNING: you probably should have called setContentView() first");
+            LOGGER.warn("WARNING: you probably should have called setContentView() first");
             Thread.dumpStack();
             return null;
         }

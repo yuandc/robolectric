@@ -1,5 +1,6 @@
 package com.xtremelabs.robolectric.bytecode;
 
+import com.xtremelabs.robolectric.Robolectric;
 import com.xtremelabs.robolectric.RobolectricConfig;
 import com.xtremelabs.robolectric.internal.RealObject;
 import com.xtremelabs.robolectric.util.I18nException;
@@ -8,6 +9,8 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import javassist.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -24,16 +27,15 @@ import java.util.Map;
 
 public class ShadowWrangler implements ClassHandler {
     public static final String SHADOW_FIELD_NAME = "__shadow__";
+    private static final Logger LOGGER = LoggerFactory.getLogger(Robolectric.class);
 
     private static ShadowWrangler singleton;
 
-    public boolean debug = false;
     private boolean strictI18n = false;
     
     private final Map<Class, MetaShadow> metaShadowMap = new HashMap<Class, MetaShadow>();
     private Map<String, String> shadowClassMap = new HashMap<String, String>();
     private Map<Class, Field> shadowFieldMap = new HashMap<Class, Field>();
-    private boolean logMissingShadowMethods = false;
 
     // sorry! it really only makes sense to have one per ClassLoader anyway though [xw/hu]
     public static ShadowWrangler getInstance() {
@@ -80,14 +82,17 @@ public class ShadowWrangler implements ClassHandler {
 
     public void bindShadowClass(Class<?> realClass, Class<?> shadowClass) {
         shadowClassMap.put(realClass.getName(), shadowClass.getName());
-        if (debug) System.out.println("shadow " + realClass + " with " + shadowClass);
+        LOGGER.debug("Shadowing {} with {}.", realClass, shadowClass);
     }
 
     @Override
     public Object methodInvoked(Class clazz, String methodName, Object instance, String[] paramTypes, Object[] params) throws Throwable {
         InvocationPlan invocationPlan = new InvocationPlan(clazz, methodName, instance, paramTypes);
         if (!invocationPlan.prepare()) {
-            reportNoShadowMethodFound(clazz, methodName, paramTypes);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("No shadow implementation found for {}.{}({})",
+                        clazz.getSimpleName(), methodName, Join.join(", ", (Object[]) paramTypes));
+            }
             return null;
         }
         
@@ -119,13 +124,6 @@ public class ShadowWrangler implements ClassHandler {
         }
         throwable.setStackTrace(stackTrace.toArray(new StackTraceElement[stackTrace.size()]));
         return throwable;
-    }
-
-    private void reportNoShadowMethodFound(Class clazz, String methodName, String[] paramTypes) {
-        if (logMissingShadowMethods) {
-            System.out.println("No Shadow method found for " + clazz.getSimpleName() + "." + methodName + "(" +
-                    Join.join(", ", (Object[]) paramTypes) + ")");
-        }
     }
 
     public static Class<?> loadClass(String paramType, ClassLoader classLoader) {
@@ -162,12 +160,13 @@ public class ShadowWrangler implements ClassHandler {
             return shadow;
         }
 
-        String shadowClassName = getShadowClassName(instance.getClass());
+        Class<?> clazz = instance.getClass();
+        String shadowClassName = getShadowClassName(clazz);
 
-        if (debug)
-            System.out.println("creating new " + shadowClassName + " as shadow for " + instance.getClass().getName());
+        LOGGER.debug("creating new {} as shadow for  {}", shadowClassName, clazz.getName());
+
         try {
-            Class<?> shadowClass = loadClass(shadowClassName, instance.getClass().getClassLoader());
+            Class<?> shadowClass = loadClass(shadowClassName, clazz.getClassLoader());
             Constructor<?> constructor = findConstructor(instance, shadowClass);
             if (constructor != null) {
                 shadow = constructor.newInstance(instance);
@@ -267,14 +266,6 @@ public class ShadowWrangler implements ClassHandler {
         }
     }
 
-    public void logMissingInvokedShadowMethods() {
-        logMissingShadowMethods = true;
-    }
-
-    public void silence() {
-        logMissingShadowMethods = false;
-    }
-
     private class InvocationPlan {
         private Class clazz;
         private ClassLoader classLoader;
@@ -346,9 +337,6 @@ public class ShadowWrangler implements ClassHandler {
             }
 
             if (method == null) {
-                if (debug) {
-                    System.out.println("No method found for " + clazz + "." + methodName + "(" + Arrays.asList(paramClasses) + ") on " + declaredShadowClass.getName());
-                }
                 return false;
             }
 

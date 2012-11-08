@@ -58,8 +58,6 @@ public class RobolectricTest {
     @Test
     public void shouldLogMissingInvokedShadowMethodsWhenRequested() throws Exception {
         Robolectric.bindShadowClass(TestShadowView.class);
-        Robolectric.logMissingInvokedShadowMethods();
-
 
         View aView = new View(null);
         // There's a shadow method for this

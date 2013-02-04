@@ -3,17 +3,19 @@ package org.robolectric.shadows;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Gallery;
-import org.robolectric.TestRunners;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class GalleryTest {
     private Gallery gallery;
     private TestOnKeyListener listener;

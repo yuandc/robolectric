@@ -1,11 +1,11 @@
 package org.robolectric.shadows;
 
-import org.robolectric.TestRunners;
-
 import android.view.ViewGroup;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 /**
  * {@link ShadowMarginLayoutParams} test suite.
  */
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class MarginLayoutParamsTest  {
 
     @Test

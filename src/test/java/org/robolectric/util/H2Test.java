@@ -2,19 +2,21 @@ package org.robolectric.util;
 
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
-import org.robolectric.TestRunners;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import java.sql.SQLException;
 
-import static org.robolectric.util.SQLite.buildInsertString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.robolectric.util.SQLite.buildInsertString;
 
 @DatabaseConfig.UsingDatabaseMap(H2Map.class)
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class H2Test {
     ContentValues values;
     @Before

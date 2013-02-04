@@ -2,17 +2,19 @@ package org.robolectric.shadows;
 
 import android.text.TextPaint;
 import android.text.TextUtils;
-import org.robolectric.TestRunners;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import java.util.Arrays;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertThat;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class TextUtilsTest {
     @Test
     public void testExpandTemplate() throws Exception {

@@ -2,23 +2,25 @@ package org.robolectric.bytecode;
 
 import android.graphics.Bitmap;
 import android.graphics.Paint;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.internal.Implementation;
-import org.robolectric.internal.Implements;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.internal.Implementation;
+import org.robolectric.internal.Implements;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-@RunWith(TestRunners.WithCustomClassList.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithCustomClassList.class)
 public class AndroidTranslatorClassInstrumentedTest {
 
     @Test
     public void testNativeMethodsAreDelegated() throws Exception {
-        Robolectric.bindShadowClass(ShadowPaintForTests.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowPaintForTests.class);
 
         Paint paint = new Paint();
         paint.setColor(1234);
@@ -28,7 +30,7 @@ public class AndroidTranslatorClassInstrumentedTest {
 
     @Test
     public void testClassesWithPrivateDefaultConstructorsCanBeShadowed() {
-        Robolectric.bindShadowClass(ShadowClassWithPrivateConstructor.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowClassWithPrivateConstructor.class);
 
         ClassWithPrivateConstructor inst = new ClassWithPrivateConstructor();
         assertThat(inst.getInt(), is(42));
@@ -47,7 +49,7 @@ public class AndroidTranslatorClassInstrumentedTest {
      */
     @Test
     public void testCustomMethodShadowed() throws Exception {
-        Robolectric.bindShadowClass(ShadowCustomPaint.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowCustomPaint.class);
 
         CustomPaint customPaint = new CustomPaint();
         assertThat(customPaint.getColor(), equalTo(10));
@@ -60,7 +62,7 @@ public class AndroidTranslatorClassInstrumentedTest {
      */
     @Test
     public void testCustomMethodNotShadowed() throws Exception {
-        Robolectric.bindShadowClass(ShadowCustomXmasPaint.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowCustomXmasPaint.class);
 
         CustomXmasPaint customXmasPaint = new CustomXmasPaint();
         assertThat(customXmasPaint.getColor(), equalTo(999));

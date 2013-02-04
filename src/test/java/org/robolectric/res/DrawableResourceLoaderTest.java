@@ -7,23 +7,25 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.StateListDrawable;
-import org.robolectric.R;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.shadows.ShadowStateListDrawable;
-import org.robolectric.tester.android.util.ResName;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.R;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.shadows.ShadowStateListDrawable;
+import org.robolectric.tester.android.util.ResName;
 
-import static org.robolectric.util.TestUtil.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.robolectric.util.TestUtil.*;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class DrawableResourceLoaderTest {
     protected DrawableResourceLoader drawableResourceLoader;
     private DrawableBuilder drawableBuilder;

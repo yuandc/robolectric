@@ -1,20 +1,20 @@
 package org.robolectric.shadows;
 
-import org.robolectric.TestRunners;
+import android.webkit.SslErrorHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.webkit.SslErrorHandler;
-
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.assertThat;
 
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class SslErrorHandlerTest {
 
     private SslErrorHandler handler;

@@ -1,19 +1,28 @@
 package org.robolectric.shadows;
 
-import android.graphics.*;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import static org.robolectric.Robolectric.shadowOf;
-import static org.robolectric.shadows.ShadowPath.Point.Type.LINE_TO;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
+import static org.robolectric.Robolectric.shadowOf;
+import static org.robolectric.shadows.ShadowPath.Point.Type.LINE_TO;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class CanvasTest {
     private Bitmap targetBitmap;
     private Bitmap imageBitmap;

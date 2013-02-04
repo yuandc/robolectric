@@ -1,19 +1,19 @@
 package org.robolectric.shadows;
 
-import org.robolectric.TestRunners;
+import android.app.Activity;
+import android.view.animation.LayoutAnimationController;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import android.app.Activity;
-import android.view.animation.LayoutAnimationController;
-
-import org.robolectric.Robolectric;
-
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class LayoutAnimationControllerTest {
 	private ShadowLayoutAnimationController shadow;
 	

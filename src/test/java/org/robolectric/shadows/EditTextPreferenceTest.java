@@ -1,21 +1,21 @@
 package org.robolectric.shadows;
 
+import android.app.Activity;
+import android.content.Context;
+import android.preference.EditTextPreference;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.tester.android.util.TestAttributeSet;
+
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-import org.robolectric.TestRunners;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import android.app.Activity;
-import android.content.Context;
-import android.preference.EditTextPreference;
-
-import org.robolectric.tester.android.util.TestAttributeSet;
-
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class EditTextPreferenceTest {
 
 	private static final String SOME_TEXT = "some text";

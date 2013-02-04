@@ -8,17 +8,19 @@ import android.content.ContextWrapper;
 import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.TextView;
-import org.robolectric.R;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.R;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static org.junit.Assert.*;
+import static org.robolectric.Robolectric.shadowOf;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AppWidgetManagerTest {
     private AppWidgetManager appWidgetManager;
     private ShadowAppWidgetManager shadowAppWidgetManager;

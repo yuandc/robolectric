@@ -1,20 +1,22 @@
 package org.robolectric.bytecode;
 
-import org.robolectric.TestRunners;
-import org.robolectric.internal.Implements;
-import org.robolectric.internal.Instrument;
-import org.robolectric.internal.RealObject;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.internal.Implements;
+import org.robolectric.internal.Instrument;
+import org.robolectric.internal.RealObject;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
 import static org.robolectric.Robolectric.bindShadowClasses;
 import static org.robolectric.Robolectric.directlyOn;
-import static org.junit.Assert.assertEquals;
 
-@RunWith(TestRunners.RealApisWithoutDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.RealApisWithoutDefaults.class)
 public class RealApisSuperHandlingTest {
     @Test @Ignore
     public void eventually_subclassesNotExplicitlyMarkedInstrumentedShouldBeAbleToCallSuperWithoutLooping() throws Exception {

@@ -1,18 +1,18 @@
 package org.robolectric.shadows;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import org.robolectric.TestRunners;
+import android.location.Criteria;
 import junit.framework.Assert;
-
 import org.hamcrest.core.IsEqual;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import android.location.Criteria;
+import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class CriteriaTest {
     private Criteria criteria;
 

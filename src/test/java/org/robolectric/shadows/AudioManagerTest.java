@@ -2,15 +2,17 @@ package org.robolectric.shadows;
 
 
 import android.media.AudioManager;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.junit.Assert.*;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AudioManagerTest {
     private AudioManager audioManager;
     private ShadowAudioManager shadowAudioManager;

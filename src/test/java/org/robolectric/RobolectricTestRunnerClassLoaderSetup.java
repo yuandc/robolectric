@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.bytecode.RobolectricClassLoader;
 
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class RobolectricTestRunnerClassLoaderSetup {
 
     @Test

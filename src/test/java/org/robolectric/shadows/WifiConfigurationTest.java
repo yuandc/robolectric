@@ -1,16 +1,18 @@
 package org.robolectric.shadows;
 
 import android.net.wifi.WifiConfiguration;
-import org.robolectric.TestRunners;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static junit.framework.Assert.assertNotNull;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import static org.robolectric.Robolectric.shadowOf;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class WifiConfigurationTest {
     @Test
     public void shouldSetTheBitSetsAndWepKeyArrays() throws Exception {

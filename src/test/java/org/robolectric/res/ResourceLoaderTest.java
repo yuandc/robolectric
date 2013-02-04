@@ -4,25 +4,27 @@ package org.robolectric.res;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import org.robolectric.R;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.annotation.Values;
-import org.robolectric.tester.android.util.ResName;
-import org.robolectric.util.I18nException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.R;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.annotation.Values;
+import org.robolectric.tester.android.util.ResName;
+import org.robolectric.util.I18nException;
 
 import java.util.Arrays;
 
-import static org.robolectric.Robolectric.shadowOf;
-import static org.robolectric.util.TestUtil.resourceFile;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.core.IsCollectionContaining.hasItems;
 import static org.junit.Assert.*;
+import static org.robolectric.Robolectric.shadowOf;
+import static org.robolectric.util.TestUtil.resourceFile;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class ResourceLoaderTest {
     private ResourcePath resourcePath;
 

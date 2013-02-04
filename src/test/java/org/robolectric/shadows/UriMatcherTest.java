@@ -2,19 +2,21 @@ package org.robolectric.shadows;
 
 import android.content.UriMatcher;
 import android.net.Uri;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.shadows.ShadowUriMatcher.MatchNode;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.shadows.ShadowUriMatcher.MatchNode;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class UriMatcherTest {
 	static final String AUTH = "com.foo";
 	static final int NO_MATCH = -2;

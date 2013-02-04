@@ -10,14 +10,14 @@ import static org.robolectric.Robolectric.shadowOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class TemporaryBindingsTest {
 
     @Test
     public void overridingShadowBindingsShouldNotAffectBindingsInLaterTests() throws Exception {
         assertThat(shadowOf(new View(null)).getClass().getSimpleName(), equalTo(ShadowView.class.getSimpleName()));
 
-        Robolectric.bindShadowClass(TemporaryShadowView.class);
+        Robolectric.getShadowWrangler().bindShadowClass(TemporaryShadowView.class);
 
         assertThat(Robolectric.shadowOf_(new View(null)).getClass().getSimpleName(),
                 equalTo(TemporaryShadowView.class.getSimpleName()));
@@ -27,7 +27,7 @@ public class TemporaryBindingsTest {
     public void overridingShadowBindingsShouldNotAffectBindingsInLaterTestsAgain() throws Exception {
         assertThat(shadowOf(new View(null)).getClass().getSimpleName(), equalTo(ShadowView.class.getSimpleName()));
 
-        Robolectric.bindShadowClass(TemporaryShadowView.class);
+        Robolectric.getShadowWrangler().bindShadowClass(TemporaryShadowView.class);
 
         assertThat(Robolectric.shadowOf_(new View(null)).getClass().getSimpleName(),
                 equalTo(TemporaryShadowView.class.getSimpleName()));

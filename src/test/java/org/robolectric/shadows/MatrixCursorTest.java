@@ -1,21 +1,18 @@
 package org.robolectric.shadows;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import org.robolectric.TestRunners;
+import android.database.CursorIndexOutOfBoundsException;
+import android.database.MatrixCursor;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import android.database.CursorIndexOutOfBoundsException;
-import android.database.MatrixCursor;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class MatrixCursorTest {
 
     private MatrixCursor singleColumnSingleNullValueMatrixCursor;

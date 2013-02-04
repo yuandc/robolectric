@@ -1,23 +1,23 @@
 package org.robolectric.shadows;
 
-import java.util.concurrent.TimeUnit;
-
-import org.robolectric.TestRunners;
+import android.os.AsyncTask;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.os.AsyncTask;
-
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 import org.robolectric.util.Join;
 import org.robolectric.util.Transcript;
+
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AsyncTaskTest {
     private Transcript transcript;
 

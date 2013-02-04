@@ -1,15 +1,16 @@
 package org.robolectric.shadows;
 
-import static org.junit.Assert.assertEquals;
-
-import org.robolectric.TestRunners;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import android.view.View;
 import android.view.View.MeasureSpec;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-@RunWith(TestRunners.WithDefaults.class)
+import static org.junit.Assert.assertEquals;
+
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class ViewMeasureSpecTest {
 
 	@Test

@@ -1,21 +1,22 @@
 package org.robolectric.shadows;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.util.Strings;
+import android.net.http.AndroidHttpClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.net.http.AndroidHttpClient;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.util.Strings;
 
 import java.io.IOException;
 
-@RunWith(TestRunners.WithDefaults.class)
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AndroidHttpClientTest {
 
     @Test

@@ -9,18 +9,20 @@ import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import org.robolectric.R;
-import org.robolectric.TestRunners;
-import org.robolectric.tester.android.util.TestFragmentManager;
-import org.robolectric.util.Transcript;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.R;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.tester.android.util.TestFragmentManager;
+import org.robolectric.util.Transcript;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static org.junit.Assert.*;
+import static org.robolectric.Robolectric.shadowOf;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class DialogFragmentTest {
 
     private FragmentActivity activity;

@@ -13,7 +13,7 @@ import org.junit.runners.model.InitializationError;
 import static org.robolectric.Robolectric.shadowOf;
 import static org.junit.Assert.*;
 
-@RunWith(RobolectricTestRunnerTest.RunnerForTesting.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(RobolectricTestRunnerTest.RunnerForTesting.class)
 public class RobolectricTestRunnerTest {
 
     @Test
@@ -91,17 +91,18 @@ public class RobolectricTestRunnerTest {
         }
     }
 
-    public static class RunnerForTesting extends TestRunners.WithDefaults {
+    public static class RunnerForTesting extends TestConfigs.WithDefaults {
         public static RunnerForTesting instance;
-        private final AndroidManifest androidManifest;
+//        private final AndroidManifest androidManifest;
 
         public RunnerForTesting(Class<?> testClass) throws InitializationError {
-            super(testClass);
+//            super(testClass);
             instance = this;
-            androidManifest = getRobolectricContext().getAppManifest();
+//            androidManifest = getRobolectricContext().getAppManifest();
         }
 
-        @Override protected Application createApplication() {
+//        @Override
+        protected Application createApplication() {
             return new MyTestApplication();
         }
     }

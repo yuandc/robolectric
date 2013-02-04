@@ -1,12 +1,24 @@
 package org.robolectric.bytecode;
 
+import org.robolectric.internal.Implements;
 import org.robolectric.internal.RealObject;
 import org.robolectric.util.I18nException;
 import org.robolectric.util.Join;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 
@@ -23,6 +35,8 @@ public class ShadowWrangler implements ClassHandler {
     private Map<String, String> shadowClassMap = new HashMap<String, String>();
     private boolean logMissingShadowMethods = false;
     private static int callDepth = 0;
+
+    private static Set<String> unloadableClassNames = new HashSet<String>();
 
     public ShadowWrangler(Setup setup) {
         this.setup = setup;
@@ -63,6 +77,27 @@ public class ShadowWrangler implements ClassHandler {
         }
     }
 
+    public void bindShadowClass(Class<?> shadowClass) {
+        Implements realClass = shadowClass.getAnnotation(Implements.class);
+        if (realClass == null) {
+            throw new IllegalArgumentException(shadowClass + " is not annotated with @Implements");
+        }
+
+        try {
+            bindShadowClass(realClass.value(), shadowClass);
+        } catch (TypeNotPresentException typeLoadingException) {
+            String unloadableClassName = shadowClass.getSimpleName();
+            if (isIgnorableClassLoadingException(typeLoadingException)) {
+                //this allows users of the robolectric.jar file to use the non-Google APIs version of the api
+                if (unloadableClassNames.add(unloadableClassName)) {
+                    System.out.println("Warning: an error occurred while binding shadow class: " + unloadableClassName);
+                }
+            } else {
+                throw typeLoadingException;
+            }
+        }
+    }
+
     public void bindShadowClass(String realClassName, Class<?> shadowClass) {
         bindShadowClass(realClassName, shadowClass.getName());
     }
@@ -74,6 +109,22 @@ public class ShadowWrangler implements ClassHandler {
     public void bindShadowClass(String realClassName, String shadowClassName) {
         shadowClassMap.put(realClassName, shadowClassName);
         if (debug) System.out.println("shadow " + realClassName + " with " + shadowClassName);
+    }
+
+    private static boolean isIgnorableClassLoadingException(Throwable typeLoadingException) {
+        if (typeLoadingException != null) {
+            // instanceof doesn't work here. Are we in different classloaders?
+            if (typeLoadingException.getClass().getName().equals(IgnorableClassNotFoundException.class.getName())) {
+                return true;
+            }
+
+            if (typeLoadingException instanceof NoClassDefFoundError
+                    || typeLoadingException instanceof ClassNotFoundException
+                    || typeLoadingException instanceof TypeNotPresentException) {
+                return isIgnorableClassLoadingException(typeLoadingException.getCause());
+            }
+        }
+        return false;
     }
 
     private String indent(int count) {

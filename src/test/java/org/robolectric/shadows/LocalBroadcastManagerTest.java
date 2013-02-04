@@ -5,18 +5,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.v4.content.LocalBroadcastManager;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.util.TestBroadcastReceiver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.util.TestBroadcastReceiver;
 
 import java.util.List;
 
-import static org.robolectric.Robolectric.shadowOf_;
 import static junit.framework.Assert.*;
+import static org.robolectric.Robolectric.shadowOf_;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class LocalBroadcastManagerTest {
     private static LocalBroadcastManager lastInstance;
 

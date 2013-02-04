@@ -1,19 +1,21 @@
 package org.robolectric.bytecode;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 import org.robolectric.internal.Implements;
 import org.robolectric.internal.Instrument;
 import org.robolectric.internal.RealObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import java.util.Arrays;
 
-import static org.robolectric.Robolectric.bindShadowClasses;
 import static org.junit.Assert.assertEquals;
+import static org.robolectric.Robolectric.bindShadowClasses;
 
-@RunWith(TestRunners.WithoutDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithoutDefaults.class)
 public class ClassicSuperHandlingTest {
     @Test
     public void uninstrumentedSubclassesShouldBeAbleToCallSuperWithoutLooping() throws Exception {

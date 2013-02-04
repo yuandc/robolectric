@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
 import static org.robolectric.util.TestUtil.newConfig;
 import static org.robolectric.util.TestUtil.resourceFile;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AndroidManifestTest {
     @Test
     public void shouldReadBroadcastReceivers() throws Exception {

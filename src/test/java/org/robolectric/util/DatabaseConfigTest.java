@@ -1,18 +1,20 @@
 package org.robolectric.util;
 
-import org.robolectric.TestRunners;
-import org.robolectric.util.DatabaseConfig.DatabaseMap;
-import org.robolectric.util.DatabaseConfig.NullDatabaseMapException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.util.DatabaseConfig.DatabaseMap;
+import org.robolectric.util.DatabaseConfig.NullDatabaseMapException;
 
 import java.sql.ResultSet;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class DatabaseConfigTest {
 
     @Before

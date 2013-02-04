@@ -1,17 +1,17 @@
 package org.robolectric.bytecode;
 
-import org.robolectric.TestRunners;
-import org.robolectric.internal.Implements;
-import org.robolectric.internal.Instrument;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.internal.Implements;
+import org.robolectric.internal.Instrument;
 
-import static org.robolectric.Robolectric.bindShadowClass;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
-@RunWith(TestRunners.WithoutDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithoutDefaults.class)
 public class StaticInitializerTest {
     @Test
     public void whenClassIsUnshadowed_shouldPerformStaticInitialization() throws Exception {
@@ -24,7 +24,7 @@ public class StaticInitializerTest {
 
     @Test
     public void whenClassHasShadowWithoutOverrideMethod_shouldPerformStaticInitialization() throws Exception {
-        bindShadowClass(ShadowClassWithoutStaticInitializerOverride.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowClassWithoutStaticInitializerOverride.class);
         assertEquals("Floyd", ClassWithStaticInitializerB.name);
 
         AndroidTranslator.performStaticInitialization(ClassWithStaticInitializerB.class);
@@ -39,7 +39,7 @@ public class StaticInitializerTest {
     @Test
     public void whenClassHasShadowWithOverrideMethod_shouldDeferStaticInitialization() throws Exception {
         assertFalse(ShadowClassWithStaticInitializerOverride.initialized);
-        bindShadowClass(ShadowClassWithStaticInitializerOverride.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowClassWithStaticInitializerOverride.class);
         assertEquals(null, ClassWithStaticInitializerC.name);
         assertTrue(ShadowClassWithStaticInitializerOverride.initialized);
 

@@ -1,23 +1,25 @@
 package org.robolectric.shadows;
 
 import android.content.ContentValues;
-import org.robolectric.TestRunners;
-import org.robolectric.util.DatabaseConfig;
-import org.robolectric.util.SQLiteMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.util.DatabaseConfig;
+import org.robolectric.util.SQLiteMap;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
+import static org.robolectric.Robolectric.shadowOf;
 
 @DatabaseConfig.UsingDatabaseMap(SQLiteMap.class)
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class SQLiteDatabaseTest extends DatabaseTestBase {
 
     @Test

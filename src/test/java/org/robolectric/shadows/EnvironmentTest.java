@@ -1,19 +1,20 @@
 package org.robolectric.shadows;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-
-import org.robolectric.TestRunners;
+import android.os.Environment;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import android.os.Environment;
+import java.io.File;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class EnvironmentTest {
 
 	@After

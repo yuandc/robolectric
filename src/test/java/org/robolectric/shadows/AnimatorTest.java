@@ -2,15 +2,17 @@ package org.robolectric.shadows;
 
 import android.animation.Animator;
 import android.animation.TimeInterpolator;
-import org.robolectric.RobolectricShadowOfLevel16;
-import org.robolectric.TestRunners;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricShadowOfLevel16;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AnimatorTest {
     @Test
     public void shouldBeAbleToNotifyListenersOfStartAndEnd() throws Exception {

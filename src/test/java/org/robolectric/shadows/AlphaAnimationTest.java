@@ -1,14 +1,16 @@
 package org.robolectric.shadows;
 
 import android.view.animation.AlphaAnimation;
-import org.robolectric.TestRunners;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static junit.framework.Assert.assertEquals;
+import static org.robolectric.Robolectric.shadowOf;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AlphaAnimationTest {
     @Test
     public void getFromAlpha_shouldReturnTheFromAlphaThatWasPassedToTheConstructor() throws Exception {

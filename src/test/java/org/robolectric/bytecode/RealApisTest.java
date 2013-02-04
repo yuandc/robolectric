@@ -1,26 +1,28 @@
 package org.robolectric.bytecode;
 
-import org.robolectric.TestRunners;
-import org.robolectric.internal.Implements;
-import org.robolectric.internal.Instrument;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.internal.Implements;
+import org.robolectric.internal.Instrument;
 
-import static org.robolectric.Robolectric.bindShadowClass;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(TestRunners.RealApisWithoutDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.RealApisWithoutDefaults.class)
 public class RealApisTest {
     @Test
     public void whenShadowHandlerIsInRealityBasedMode_shouldNotCallRealForUnshadowedMethod() throws Exception {
-        bindShadowClass(Pony.ShadowPony.class);
+        Robolectric.getShadowWrangler().bindShadowClass(Pony.ShadowPony.class);
 
         assertEquals("Off I saunter to the salon!", new Pony("abc").saunter("the salon"));
     }
 
     @Test
     public void shouldCallOriginalConstructorBodySomehow() throws Exception {
-        bindShadowClass(ShadowOfClassWithSomeConstructors.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowOfClassWithSomeConstructors.class);
         ClassWithSomeConstructors o = new ClassWithSomeConstructors("my name");
         assertEquals("my name", o.name);
     }

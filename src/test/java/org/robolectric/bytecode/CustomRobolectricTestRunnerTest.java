@@ -1,13 +1,17 @@
 package org.robolectric.bytecode;
 
 import android.app.Application;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.FrameworkMethod;
+import org.robolectric.DefaultTestRun;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricContext;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import java.lang.reflect.Method;
 
@@ -15,7 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(CustomRobolectricTestRunnerTest.CustomRobolectricTestRunner.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(CustomRobolectricTestRunnerTest.CustomConfig.class)
 public class CustomRobolectricTestRunnerTest {
     Object preparedTest;
     static Method testMethod;
@@ -50,25 +54,33 @@ public class CustomRobolectricTestRunnerTest {
         assertEquals(beforeCallCount, afterTestCallCount);
     }
 
-    public static class CustomRobolectricTestRunner extends TestRunners.WithDefaults {
-        public CustomRobolectricTestRunner(Class<?> testClass) throws InitializationError {
-            super(testClass);
+    public static class CustomConfig extends TestConfigs.WithDefaults {
+        @Override
+        public Class<? extends DefaultTestRun> getTestRunClass(FrameworkMethod method) {
+            return CustomTestRun.class;
         }
 
-        @Override public void prepareTest(Object test) {
-            ((CustomRobolectricTestRunnerTest) test).preparedTest = test;
-        }
+        public static class CustomTestRun extends DefaultTestRun {
+            public CustomTestRun(RobolectricContext robolectricContext, FrameworkMethod frameworkMethod) {
+                super(robolectricContext, frameworkMethod);
+            }
 
-        @Override public void beforeTest(Method method) {
-            testMethod = method;
-        }
+            @Override public void prepareTest(Object test) {
+                ((CustomRobolectricTestRunnerTest) test).preparedTest = test;
+            }
 
-        @Override public void afterTest(Method method) {
-            afterTestCallCount++;
-        }
+            @Override public void beforeTest(Method method) {
+                testMethod = method;
+            }
 
-        @Override protected Application createApplication() {
-            return new CustomApplication();
+            @Override public void afterTest(Method method) {
+                afterTestCallCount++;
+            }
+
+            @Override protected Application createApplication() {
+                return new CustomApplication();
+            }
+
         }
     }
 

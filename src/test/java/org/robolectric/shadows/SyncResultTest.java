@@ -1,18 +1,19 @@
 package org.robolectric.shadows;
 
+import android.content.SyncResult;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
-import org.robolectric.TestRunners;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import android.content.SyncResult;
-
-
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class SyncResultTest {
 
     @Test

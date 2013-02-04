@@ -2,21 +2,26 @@ package org.robolectric.bytecode;
 
 import android.R;
 import android.net.Uri__FromAndroid;
+import javassist.CtClass;
 import org.robolectric.AndroidManifest;
 import org.robolectric.RobolectricContext;
+import org.robolectric.TestRun;
 import org.robolectric.annotation.DisableStrictI18n;
 import org.robolectric.annotation.EnableStrictI18n;
 import org.robolectric.annotation.Values;
 import org.robolectric.internal.DoNotInstrument;
+import org.robolectric.internal.Implementation;
+import org.robolectric.internal.Implements;
 import org.robolectric.internal.Instrument;
 import org.robolectric.internal.RealObject;
-import org.robolectric.internal.RobolectricTestRunnerInterface;
 import org.robolectric.res.ResourcePath;
 import org.robolectric.util.DatabaseConfig;
 import org.robolectric.util.I18nException;
-import javassist.CtClass;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static java.util.Arrays.asList;
 
@@ -25,7 +30,7 @@ public class Setup {
         //noinspection unchecked
         return asList(
                 Uri__FromAndroid.class,
-                RobolectricTestRunnerInterface.class,
+//                RobolectricTestRunnerInterface.class,
                 RealObject.class,
                 ShadowWrangler.class,
                 Vars.class,
@@ -39,8 +44,12 @@ public class Setup {
                 ResourcePath.class,
                 AndroidTranslator.class,
                 ClassHandler.class,
+                Implements.class,
+                Implementation.class,
                 Instrument.class,
                 DoNotInstrument.class,
+                RobolectricContext.class,
+                TestRun.class,
                 Values.class,
                 EnableStrictI18n.class,
                 DisableStrictI18n.class,

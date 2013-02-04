@@ -2,16 +2,18 @@ package org.robolectric.shadows;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import org.robolectric.R;
-import org.robolectric.TestRunners;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.R;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class FragmentTest {
     private Fragment fragment;
     private FragmentActivity fragmentActivity;

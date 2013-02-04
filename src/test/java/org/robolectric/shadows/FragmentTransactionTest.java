@@ -5,18 +5,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
-import org.robolectric.TestRunners;
-import org.robolectric.tester.android.util.TestFragmentManager;
-import org.robolectric.tester.android.util.TestFragmentTransaction;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.tester.android.util.TestFragmentManager;
+import org.robolectric.tester.android.util.TestFragmentTransaction;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static org.junit.Assert.*;
+import static org.robolectric.Robolectric.shadowOf;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class FragmentTransactionTest {
     private MockTestFragmentManager manager;
     private Fragment fragment;

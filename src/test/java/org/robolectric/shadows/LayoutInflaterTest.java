@@ -2,16 +2,18 @@ package org.robolectric.shadows;
 
 import android.content.ContextWrapper;
 import android.view.LayoutInflater;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class LayoutInflaterTest {
     private LayoutInflater layoutInflater;
 

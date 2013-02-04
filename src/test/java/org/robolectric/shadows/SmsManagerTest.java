@@ -1,18 +1,17 @@
 package org.robolectric.shadows;
 
-import org.robolectric.TestRunners;
+import android.telephony.SmsManager;
 import junit.framework.Assert;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.telephony.SmsManager;
-
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class SmsManagerTest {
 	
 	private SmsManager smsManager;
@@ -24,7 +23,7 @@ public class SmsManagerTest {
 	
 	@Before
 	public void setup() {
-		Robolectric.bindShadowClass(ShadowSmsManager.class);
+		Robolectric.getShadowWrangler().bindShadowClass(ShadowSmsManager.class);
 		smsManager = SmsManager.getDefault();
 		shadowSmsManager = Robolectric.shadowOf(smsManager);
 	}

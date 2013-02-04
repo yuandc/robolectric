@@ -1,11 +1,13 @@
 package org.robolectric.util;
 
-import org.robolectric.TestRunners;
-import org.robolectric.util.DatabaseConfig.CannotLoadDatabaseMapDriverException;
-import org.robolectric.util.DatabaseConfig.UsingDatabaseMap;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.util.DatabaseConfig.CannotLoadDatabaseMapDriverException;
+import org.robolectric.util.DatabaseConfig.UsingDatabaseMap;
 
 import java.sql.Connection;
 
@@ -15,7 +17,7 @@ import java.sql.Connection;
  *
  */
 @UsingDatabaseMap(NullDatabaseMap.class)
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class NullDatabaseMapTest {
 
 	@Test

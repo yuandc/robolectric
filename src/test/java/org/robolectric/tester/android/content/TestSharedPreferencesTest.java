@@ -1,22 +1,23 @@
 package org.robolectric.tester.android.content;
 
-import org.robolectric.TestRunners;
+import android.content.SharedPreferences;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.SharedPreferences;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.*;
 
 /**
  * TestSharedPreferencesTest
  */
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class TestSharedPreferencesTest {
 	protected final static String FILENAME = "filename";
 	private HashMap<String, Map<String, Object>> content;

@@ -1,13 +1,11 @@
 package org.robolectric;
 
-import org.robolectric.util.Transcript;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.FrameworkMethod;
+import org.robolectric.util.Transcript;
 
 import java.lang.reflect.Method;
 
-@RunWith(TestRunnerSequenceTest.Runner.class)
 public class TestRunnerSequenceTest {
     public static Transcript transcript = new Transcript();
 
@@ -20,31 +18,33 @@ public class TestRunnerSequenceTest {
         );
     }
 
-    public static class Runner extends RobolectricTestRunner {
-        public Runner(Class<?> testClass) throws InitializationError {
-            super(RobolectricContext.bootstrap(Runner.class, testClass, new RobolectricContext.Factory() {
-                @Override
-                public RobolectricContext create() {
-                    return new RobolectricContext();
-                }
-            }));
-        }
-
-        @Override public void beforeTest(Method method) {
-            transcript.add("beforeTest");
-        }
-
-        @Override protected void resetStaticState() {
-            transcript.add("resetStaticState");
-        }
-
-        @Override protected void configureShadows(Method testMethod) {
-            transcript.add("configureShadows");
-        }
-
+    public static class Runner extends RobolectricContext {
         @Override
-        public void setupApplicationState(Method testMethod) {
-            transcript.add("setupApplicationState");
+        public Class<? extends DefaultTestRun> getTestRunClass(FrameworkMethod method) {
+            return MyTestRun.class;
+        }
+
+        public static class MyTestRun extends DefaultTestRun {
+            public MyTestRun(RobolectricContext robolectricContext, FrameworkMethod frameworkMethod) {
+                super(robolectricContext, frameworkMethod);
+            }
+
+            @Override public void beforeTest(Method method) {
+                transcript.add("beforeTest");
+            }
+
+            @Override protected void resetStaticState() {
+                transcript.add("resetStaticState");
+            }
+
+            @Override protected void configureShadows(Method testMethod) {
+                transcript.add("configureShadows");
+            }
+
+            @Override
+            public void setupApplicationState(Method testMethod) {
+                transcript.add("setupApplicationState");
+            }
         }
     }
 }

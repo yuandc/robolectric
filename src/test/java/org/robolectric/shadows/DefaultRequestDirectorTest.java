@@ -1,11 +1,5 @@
 package org.robolectric.shadows;
 
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.tester.org.apache.http.FakeHttpLayer;
-import org.robolectric.tester.org.apache.http.RequestMatcher;
-import org.robolectric.tester.org.apache.http.TestHttpResponse;
-import org.robolectric.util.Strings;
 import junit.framework.Assert;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -25,16 +19,24 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.tester.org.apache.http.FakeHttpLayer;
+import org.robolectric.tester.org.apache.http.RequestMatcher;
+import org.robolectric.tester.org.apache.http.TestHttpResponse;
+import org.robolectric.util.Strings;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import static org.robolectric.Robolectric.shadowOf;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.*;
+import static org.robolectric.Robolectric.shadowOf;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class DefaultRequestDirectorTest {
     private DefaultRequestDirector requestDirector;
     private ConnectionKeepAliveStrategy connectionKeepAliveStrategy;

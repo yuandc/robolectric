@@ -1,37 +1,39 @@
 package org.robolectric.shadows;
 
-import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-import static org.robolectric.Robolectric.shadowOf;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.*;
+import android.accounts.Account;
+import android.app.Activity;
+import android.content.ContentProvider;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.content.OperationApplicationException;
+import android.content.PeriodicSync;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.RemoteException;
+import org.hamcrest.CoreMatchers;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.tester.android.database.TestCursor;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.accounts.Account;
-import android.content.*;
-import android.os.Bundle;
-import org.robolectric.TestRunners;
-import org.hamcrest.CoreMatchers;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import static android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.robolectric.Robolectric.shadowOf;
 
-import android.app.Activity;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.RemoteException;
-
-import org.robolectric.tester.android.database.TestCursor;
-
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class ContentResolverTest {
     static final String AUTHORITY = "org.robolectric";
 

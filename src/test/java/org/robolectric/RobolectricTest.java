@@ -32,7 +32,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class RobolectricTest {
 
     private PrintStream originalSystemOut;
@@ -58,7 +58,7 @@ public class RobolectricTest {
 
     @Test
     public void shouldLogMissingInvokedShadowMethodsWhenRequested() throws Exception {
-        Robolectric.bindShadowClass(TestShadowView.class);
+        Robolectric.getShadowWrangler().bindShadowClass(TestShadowView.class);
         Robolectric.logMissingInvokedShadowMethods();
 
         View aView = new View(null);

@@ -1,20 +1,20 @@
 package org.robolectric.shadows;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderOperation.Builder;
+import android.net.Uri;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import org.robolectric.TestRunners;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
-import android.content.ContentProviderOperation;
-import android.content.ContentProviderOperation.Builder;
-import android.net.Uri;
-
-import org.robolectric.Robolectric;
-
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class ContentProviderOperationTest {
 
     @Test

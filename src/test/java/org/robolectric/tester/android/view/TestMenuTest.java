@@ -2,16 +2,18 @@ package org.robolectric.tester.android.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.shadows.ShadowActivity;
 import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.shadows.ShadowActivity;
 
 import static org.junit.Assert.assertNotNull;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class TestMenuTest {
 
     @Test

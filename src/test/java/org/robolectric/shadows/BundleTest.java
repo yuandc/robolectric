@@ -2,19 +2,21 @@ package org.robolectric.shadows;
 
 import android.os.Bundle;
 import android.os.Parcelable;
-import org.robolectric.TestRunners;
 import junit.framework.AssertionFailedError;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class BundleTest {
 
     private Bundle bundle;

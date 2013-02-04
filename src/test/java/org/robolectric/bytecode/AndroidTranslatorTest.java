@@ -5,38 +5,36 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import com.google.android.maps.ItemizedOverlay;
-import com.google.android.maps.OverlayItem;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
-import org.robolectric.internal.Implementation;
-import org.robolectric.internal.Implements;
-import org.robolectric.internal.Instrument;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
+import org.robolectric.internal.Implementation;
+import org.robolectric.internal.Implements;
+import org.robolectric.internal.Instrument;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import static org.robolectric.Robolectric.bindShadowClass;
-import static org.robolectric.Robolectric.directlyOn;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.hamcrest.core.StringStartsWith.startsWith;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
+import static org.robolectric.Robolectric.directlyOn;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class AndroidTranslatorTest {
 
     @Test
     public void testStaticMethodsAreDelegated() throws Exception {
-        bindShadowClass(ShadowAccountManagerForTests.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowAccountManagerForTests.class);
 
         Context context = mock(Context.class);
         AccountManager.get(context);
@@ -58,7 +56,7 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testProtectedMethodsAreDelegated() throws Exception {
-        bindShadowClass(ShadowClassWithProtectedMethod.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowClassWithProtectedMethod.class);
 
         ClassWithProtectedMethod overlay = new ClassWithProtectedMethod();
         assertEquals("shadow name", overlay.getName());
@@ -81,7 +79,7 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testNativeMethodsAreDelegated() throws Exception {
-        bindShadowClass(ShadowPaintForTests.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowPaintForTests.class);
 
         Paint paint = new Paint();
         paint.setColor(1234);
@@ -112,7 +110,7 @@ public class AndroidTranslatorTest {
     @Ignore // todo we need to figure out a better way to deal with this...
     @Test // the shadow will still have its default constructor called; it would be duplicative to call __constructor__() too.
     public void forClassWithNoDefaultConstructor_generatedDefaultConstructorShouldNotCallShadow() throws Exception {
-        bindShadowClass(ShadowForClassWithNoDefaultConstructor.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowForClassWithNoDefaultConstructor.class);
 
         Constructor<ClassWithNoDefaultConstructor> ctor = ClassWithNoDefaultConstructor.class.getDeclaredConstructor();
         ctor.setAccessible(true);
@@ -145,7 +143,7 @@ public class AndroidTranslatorTest {
 
     @Test
     public void directlyOn_shouldCallThroughToOriginalMethodBody() throws Exception {
-        bindShadowClass(Pony.ShadowPony.class);
+        Robolectric.getShadowWrangler().bindShadowClass(Pony.ShadowPony.class);
         Pony pony = new Pony();
 
         assertEquals("Fake whinny! You're on my neck!", pony.ride("neck"));
@@ -156,7 +154,7 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testDirectlyOn_Statics() throws Exception {
-        bindShadowClass(Pony.ShadowPony.class);
+        Robolectric.getShadowWrangler().bindShadowClass(Pony.ShadowPony.class);
 
         assertEquals("I'm shadily prancing to market!", Pony.prance("market"));
         directlyOn(Pony.class);
@@ -167,7 +165,7 @@ public class AndroidTranslatorTest {
 
     @Test
     public void whenShadowHandlerIsInClassicMode_shouldNotCallRealForUnshadowedMethod() throws Exception {
-        bindShadowClass(Pony.ShadowPony.class);
+        Robolectric.getShadowWrangler().bindShadowClass(Pony.ShadowPony.class);
 
         assertEquals(null, new Pony().saunter("the salon"));
     }
@@ -191,7 +189,7 @@ public class AndroidTranslatorTest {
 
     @Test
     public void testDirectlyOn_Statics_InstanceChecking() throws Exception {
-        bindShadowClass(TextViewWithDummyGetTextColorsMethod.class);
+        Robolectric.getShadowWrangler().bindShadowClass(TextViewWithDummyGetTextColorsMethod.class);
         assertNotNull(TextView.getTextColors(null, null)); // the real implementation would asplode
 
         Exception e = null;
@@ -270,34 +268,11 @@ public class AndroidTranslatorTest {
     }
 
     @Test public void withNonApiSubclassesWhichExtendApi_shouldStillBeInvoked() throws Exception {
-        bindShadowClass(ShadowActivity.class);
+        Robolectric.getShadowWrangler().bindShadowClass(ShadowActivity.class);
         assertEquals("did foo", new MyActivity().doSomething("foo"));
     }
 
     public static class MyActivity extends Activity { public String doSomething(String value) { return "did " + value; } }
     @Instrument public static class Activity { }
     @Implements(Activity.class) public static class ShadowActivity {}
-
-
-    @Implements(ItemizedOverlay.class)
-    public static class ItemizedOverlayForTests extends ItemizedOverlay {
-        public ItemizedOverlayForTests(Drawable drawable) {
-            super(drawable);
-        }
-
-        @Override
-        protected OverlayItem createItem(int i) {
-            return null;
-        }
-
-        public void triggerProtectedCall() {
-            populate();
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-    }
-
 }

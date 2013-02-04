@@ -6,7 +6,6 @@ import android.app.AliasActivity;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
-import org.robolectric.TestRunners;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
@@ -14,11 +13,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.internal.matchers.TypeSafeMatcher;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
-import static org.robolectric.matchers.StartedMatcher.createIntent;
 import static org.junit.Assert.assertThat;
+import static org.robolectric.matchers.StartedMatcher.createIntent;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class StartedMatcherTest {
     private Activity activity;
     private Intent intentWithExtra;

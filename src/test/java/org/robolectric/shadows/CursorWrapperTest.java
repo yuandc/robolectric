@@ -1,14 +1,20 @@
 package org.robolectric.shadows;
 
 import android.content.ContentResolver;
-import android.database.*;
+import android.database.CharArrayBuffer;
+import android.database.ContentObserver;
+import android.database.Cursor;
+import android.database.CursorWrapper;
+import android.database.DataSetObserver;
 import android.net.Uri;
 import android.os.Bundle;
-import org.robolectric.Robolectric;
-import org.robolectric.TestRunners;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.robolectric.Robolectric;
+import org.robolectric.RobolectricConfig;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.TestConfigs;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -17,7 +23,7 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
 
-@RunWith(TestRunners.WithDefaults.class)
+@RunWith(RobolectricTestRunner.class) @RobolectricConfig(TestConfigs.WithDefaults.class)
 public class CursorWrapperTest {
 
     private class ForwardVerifier {

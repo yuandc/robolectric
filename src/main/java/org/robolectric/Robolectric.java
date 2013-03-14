@@ -101,7 +101,6 @@ import android.telephony.TelephonyManager;
 import android.text.ClipboardManager;
 import android.text.TextPaint;
 import android.text.format.DateFormat;
-import android.text.method.PasswordTransformationMethod;
 import android.util.SparseArray;
 import android.util.SparseBooleanArray;
 import android.util.SparseIntArray;
@@ -210,6 +209,7 @@ import org.robolectric.shadows.ShadowBundle;
 import org.robolectric.shadows.ShadowCamera;
 import org.robolectric.shadows.ShadowCanvas;
 import org.robolectric.shadows.ShadowCheckedTextView;
+import org.robolectric.shadows.ShadowChoreographer;
 import org.robolectric.shadows.ShadowClipboardManager;
 import org.robolectric.shadows.ShadowColor;
 import org.robolectric.shadows.ShadowColorDrawable;
@@ -282,7 +282,6 @@ import org.robolectric.shadows.ShadowNumberPicker;
 import org.robolectric.shadows.ShadowObjectAnimator;
 import org.robolectric.shadows.ShadowPaint;
 import org.robolectric.shadows.ShadowParcel;
-import org.robolectric.shadows.ShadowPasswordTransformationMethod;
 import org.robolectric.shadows.ShadowPath;
 import org.robolectric.shadows.ShadowPendingIntent;
 import org.robolectric.shadows.ShadowPopupWindow;
@@ -393,6 +392,15 @@ public class Robolectric {
     public static <T> Invoker directlyOn(T shadowedObject, Class<T> clazz, String methodName, Class<?>... paramTypes) {
         String directMethodName = RobolectricInternals.directMethodName(clazz.getName(), methodName);
         return method(directMethodName).withReturnType(Object.class).withParameterTypes(paramTypes).in(shadowedObject);
+    }
+
+    public static <T> Invoker directlyOn(Object shadowedObject, String clazzName, String methodName, Class<?>... paramTypes) {
+        try {
+            Class<Object> aClass = (Class<Object>) shadowedObject.getClass().getClassLoader().loadClass(clazzName);
+            return directlyOn(shadowedObject, aClass, methodName, paramTypes);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static ShadowAbsListView shadowOf(AbsListView instance) {
@@ -826,10 +834,6 @@ public class Robolectric {
 
     public static ShadowParcel shadowOf(Parcel instance) {
         return (ShadowParcel) shadowOf_(instance);
-    }
-
-    public static ShadowPasswordTransformationMethod shadowOf(PasswordTransformationMethod instance) {
-        return (ShadowPasswordTransformationMethod) shadowOf_(instance);
     }
 
     public static ShadowPath shadowOf(Path instance) {
@@ -1395,6 +1399,7 @@ public class Robolectric {
         ShadowLog.reset();
         ShadowContext.clearFilesAndCache();
         ShadowLooper.resetThreadLoopers();
+        ShadowChoreographer.resetThreadLoopers();
         ShadowDialog.reset();
         ShadowContentResolver.reset();
 //        ShadowLocalBroadcastManager.reset();

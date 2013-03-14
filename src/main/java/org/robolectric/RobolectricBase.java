@@ -74,7 +74,6 @@ import org.robolectric.shadows.ShadowCursorAdapter;
 import org.robolectric.shadows.ShadowCursorLoader;
 import org.robolectric.shadows.ShadowCursorWrapper;
 import org.robolectric.shadows.ShadowDashPathEffect;
-import org.robolectric.shadows.ShadowDataSetObservable;
 import org.robolectric.shadows.ShadowDatabaseUtils;
 import org.robolectric.shadows.ShadowDateFormat;
 import org.robolectric.shadows.ShadowDatePickerDialog;
@@ -158,7 +157,6 @@ import org.robolectric.shadows.ShadowObjectAnimator;
 import org.robolectric.shadows.ShadowOverlayItem;
 import org.robolectric.shadows.ShadowPaint;
 import org.robolectric.shadows.ShadowParcel;
-import org.robolectric.shadows.ShadowPasswordTransformationMethod;
 import org.robolectric.shadows.ShadowPath;
 import org.robolectric.shadows.ShadowPendingIntent;
 import org.robolectric.shadows.ShadowPeriodicSync;
@@ -203,6 +201,8 @@ import org.robolectric.shadows.ShadowSettings;
 import org.robolectric.shadows.ShadowShapeDrawable;
 import org.robolectric.shadows.ShadowSimpleCursorAdapter;
 import org.robolectric.shadows.ShadowSmsManager;
+import org.robolectric.shadows.ShadowSparseBooleanArray;
+import org.robolectric.shadows.ShadowSpellChecker;
 import org.robolectric.shadows.ShadowSpinner;
 import org.robolectric.shadows.ShadowSslErrorHandler;
 import org.robolectric.shadows.ShadowStatFs;
@@ -236,7 +236,6 @@ import org.robolectric.shadows.ShadowViewAnimator;
 import org.robolectric.shadows.ShadowViewConfiguration;
 import org.robolectric.shadows.ShadowViewFlipper;
 import org.robolectric.shadows.ShadowViewGroup;
-import org.robolectric.shadows.ShadowViewStub;
 import org.robolectric.shadows.ShadowViewTreeObserver;
 import org.robolectric.shadows.ShadowWebSyncManager;
 import org.robolectric.shadows.ShadowWebView;
@@ -333,7 +332,6 @@ public class RobolectricBase {
             ShadowCursorWrapper.class,
             ShadowDashPathEffect.class,
             ShadowDatabaseUtils.class,
-            ShadowDataSetObservable.class,
             ShadowDateFormat.class,
             ShadowDatePickerDialog.class,
             ShadowDebug.class,
@@ -423,7 +421,6 @@ public class RobolectricBase {
             ShadowObjectAnimator.class,
             ShadowPaint.class,
             ShadowParcel.class,
-            ShadowPasswordTransformationMethod.class,
             ShadowPath.class,
             ShadowPendingIntent.class,
             ShadowPeriodicSync.class,
@@ -467,6 +464,8 @@ public class RobolectricBase {
             ShadowSimpleCursorAdapter.class,
             ShadowShapeDrawable.class,
             ShadowSmsManager.class,
+            ShadowSparseBooleanArray.class,
+            ShadowSpellChecker.class,
             ShadowSpinner.class,
             ShadowSyncResult.class,
             ShadowSyncStats.class,
@@ -509,7 +508,6 @@ public class RobolectricBase {
             ShadowViewGroup.class,
             ShadowViewFlipper.class,
             ShadowView.ShadowMeasureSpec.class,
-            ShadowViewStub.class,
             ShadowViewTreeObserver.class,
             ShadowWebView.class,
             ShadowWebViewDatabase.class,

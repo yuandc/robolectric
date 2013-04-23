@@ -2,6 +2,8 @@ package org.robolectric;
 
 import android.app.Application;
 import android.os.Build;
+import com.android.ide.common.resources.FrameworkResources;
+import com.android.io.FolderWrapper;
 import org.apache.maven.artifact.ant.DependenciesTask;
 import org.jetbrains.annotations.TestOnly;
 import org.junit.runner.notification.RunNotifier;
@@ -26,6 +28,7 @@ import org.robolectric.bytecode.ShadowWrangler;
 import org.robolectric.bytecode.ZipClassCache;
 import org.robolectric.internal.ParallelUniverse;
 import org.robolectric.internal.ParallelUniverseInterface;
+import org.robolectric.res.FileFsFile;
 import org.robolectric.res.OverlayResourceLoader;
 import org.robolectric.res.PackageResourceLoader;
 import org.robolectric.res.ResourceLoader;
@@ -577,8 +580,16 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
 
     // this method must live on a InstrumentingClassLoader-loaded class, so it can't be on SdkEnvironment
     protected static ResourceLoader createAppResourceLoader(ResourceLoader systemResourceLoader, AndroidManifest appManifest) {
+        FrameworkResources frameworkResources = new FrameworkResources();
+
         List<PackageResourceLoader> appAndLibraryResourceLoaders = new ArrayList<PackageResourceLoader>();
         for (ResourcePath resourcePath : appManifest.getIncludedResourcePaths()) {
+            FolderWrapper rootFolder = new FolderWrapper(((FileFsFile) resourcePath.resourceBase).getFile());
+            try {
+                frameworkResources.loadResources(rootFolder);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             appAndLibraryResourceLoaders.add(createResourceLoader(resourcePath));
         }
         OverlayResourceLoader overlayResourceLoader = new OverlayResourceLoader(appManifest.getPackageName(), appAndLibraryResourceLoaders);
@@ -586,7 +597,10 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
         Map<String, ResourceLoader> resourceLoaders = new HashMap<String, ResourceLoader>();
         resourceLoaders.put("android", systemResourceLoader);
         resourceLoaders.put(appManifest.getPackageName(), overlayResourceLoader);
-        return new RoutingResourceLoader(resourceLoaders);
+        RoutingResourceLoader routingResourceLoader = new RoutingResourceLoader(resourceLoaders);
+        routingResourceLoader.setFrameworkResources(frameworkResources);
+
+        return routingResourceLoader;
     }
 
     public static PackageResourceLoader createResourceLoader(ResourcePath systemResourcePath) {

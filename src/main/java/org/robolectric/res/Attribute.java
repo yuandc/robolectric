@@ -123,7 +123,7 @@ public class Attribute {
 
     public String qualifiedValue() {
         if (value.startsWith("@")) {
-            return ResName.qualifyResourceName(value.substring(1), contextPackageName);
+            return ResName.qualifyResourceName(value.substring(1), contextPackageName, null);
         } else {
             return value;
         }

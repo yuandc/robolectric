@@ -167,3 +167,6 @@ cp $OUT/empty.jar android-base-4.1.2_r1_rc-javadoc.jar
 cp $OUT/empty.jar android-base-4.1.2_r1_rc-sources.jar
 gpg -ab android-base-4.1.2_r1_rc-sources.jar
 
+
+
+find $ANDROID_SOURCES_BASE/sdk/{common,ide_common,layoutlib_api}/src -name \*.java | egrep 'sdk/common|sdk/ide_common|sdk/layoutlib|sdk/sdkmanager/libs/sdklib/src' | xargs javac -d /tmp/out -cp ~/.m2/repository/org/robolectric/android-kxml2/4.1.2_r1_rc/android-kxml2-4.1.2_r1_rc-real.jar

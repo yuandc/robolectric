@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.TouchDelegate;
 import android.view.View;
@@ -214,7 +215,7 @@ public class ShadowView {
      */
     @Implementation
     public static View inflate(Context context, int resource, ViewGroup root) {
-        return ShadowLayoutInflater.from(context).inflate(resource, root);
+        return LayoutInflater.from(context).inflate(resource, root);
     }
 
     /**

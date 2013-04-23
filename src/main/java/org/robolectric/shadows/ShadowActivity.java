@@ -8,7 +8,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Selection;
@@ -150,17 +149,16 @@ public class ShadowActivity extends ShadowContextThemeWrapper {
         return Robolectric.application;
     }
 
-    @Override
     @Implementation
     public final Application getApplicationContext() {
         return getApplication();
     }
 
-    @Override
-    @Implementation
-    public Object getSystemService(String name) {
-        return getApplicationContext().getSystemService(name);
-    }
+//    @Override
+//    @Implementation
+//    public Object getSystemService(String name) {
+//        return getApplicationContext().getSystemService(name);
+//    }
 
     @Implementation
     public void setIntent(Intent intent) {

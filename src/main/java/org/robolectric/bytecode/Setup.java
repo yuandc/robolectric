@@ -48,6 +48,7 @@ public class Setup {
             org.robolectric.bytecode.JavassistInstrumentingClassLoader.class,
             org.robolectric.bytecode.AsmInstrumentingClassLoader.class,
             SdkEnvironment.class,
+            SdkEnvironment.SystemPackageResourceLoader.class,
             RobolectricTestRunner.class,
             RobolectricTestRunner.HelperTestRunner.class,
             ResourcePath.class,
@@ -127,6 +128,9 @@ public class Setup {
                         || name.startsWith("com.sun.")
                         || name.startsWith("org.w3c.")
                         || name.startsWith("org.xml.")
+                        || name.startsWith("com.android.ide.common.")
+                        || name.startsWith("com.android.resources.")
+                        || name.startsWith("com.android.util.")
                         || name.startsWith("org.junit")
                         || name.startsWith("org.hamcrest")
                         || name.startsWith("org.specs2") // allows for android projects with mixed scala\java tests to be

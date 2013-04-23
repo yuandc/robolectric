@@ -1,6 +1,7 @@
 package org.robolectric.res;
 
 import android.view.View;
+import com.android.ide.common.resources.FrameworkResources;
 
 import java.util.List;
 
@@ -9,11 +10,16 @@ public class OverlayResourceLoader extends XResourceLoader {
 
     private final String packageName;
     private final List<PackageResourceLoader> subResourceLoaders;
+    private FrameworkResources frameworkResources;
 
     public OverlayResourceLoader(String packageName, List<PackageResourceLoader> subResourceLoaders) {
         super(new OverlayResourceIndex(packageName, subResourceLoaders));
         this.packageName = packageName;
         this.subResourceLoaders = subResourceLoaders;
+    }
+
+    public FrameworkResources getResourceRepository() {
+        return frameworkResources;
     }
 
     @Override
@@ -58,5 +64,9 @@ public class OverlayResourceLoader extends XResourceLoader {
             if (s != null) return s;
         }
         return null;
+    }
+
+    public void setFrameworkResources(FrameworkResources frameworkResources) {
+        this.frameworkResources = frameworkResources;
     }
 }

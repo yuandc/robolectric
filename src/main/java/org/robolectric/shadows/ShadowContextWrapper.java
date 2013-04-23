@@ -1,6 +1,13 @@
 package org.robolectric.shadows;
 
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -9,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Looper;
 import android.view.View;
 import org.robolectric.AndroidManifest;
+import org.robolectric.Robolectric;
 import org.robolectric.internal.HiddenApi;
 import org.robolectric.internal.Implementation;
 import org.robolectric.internal.Implements;
@@ -29,23 +37,19 @@ import java.util.Set;
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.database.sqlite.SQLiteDatabase.CursorFactory;
+import static org.robolectric.Robolectric.directlyOn;
 import static org.robolectric.Robolectric.shadowOf;
 
 @SuppressWarnings({"UnusedDeclaration"})
 @Implements(ContextWrapper.class)
 public class ShadowContextWrapper extends ShadowContext {
     @RealObject private ContextWrapper realContextWrapper;
-    protected Context baseContext;
 
     private PackageManager packageManager;
 
     private String appName;
     private String packageName;
     private Set<String> grantedPermissions = new HashSet<String>();
-
-    public void __constructor__(Context baseContext) {
-        this.baseContext = baseContext;
-    }
 
     @Implementation
     public int checkCallingPermission(String permission) {
@@ -57,15 +61,10 @@ public class ShadowContextWrapper extends ShadowContext {
         return PackageManager.PERMISSION_GRANTED;
     }
 
-    @Implementation
-    public Context getApplicationContext() {
-        return baseContext.getApplicationContext();
-    }
-
-    @Implementation
-    public Resources.Theme getTheme() {
-        return getResources().newTheme();
-    }
+//    @Implementation
+//    public Resources.Theme getTheme() {
+//        return getResources().newTheme();
+//    }
 
     @Implementation
     @Override public File getFilesDir() {
@@ -80,6 +79,11 @@ public class ShadowContextWrapper extends ShadowContext {
     @HiddenApi @Implementation
     @Override public RoboAttributeSet createAttributeSet(List<Attribute> attributes, Class<? extends View> viewClass) {
         return super.createAttributeSet(attributes, viewClass);
+    }
+
+    @Override public Resources getResources() {
+        Context baseContext = directlyOn(realContextWrapper, ContextWrapper.class).getBaseContext();
+        return baseContext != null ? baseContext.getResources() : Robolectric.application.getResources();
     }
 
     @Implementation
@@ -104,11 +108,6 @@ public class ShadowContextWrapper extends ShadowContext {
 
     @Override public ResourceLoader getResourceLoader() {
         return super.getResourceLoader();
-    }
-
-    @Implementation
-    @Override public String getString(int resId) {
-        return super.getString(resId);
     }
 
     @Implementation
@@ -146,28 +145,28 @@ public class ShadowContextWrapper extends ShadowContext {
         return super.deleteFile(name);
     }
 
-    @Implementation
-    public Resources getResources() {
-        return getApplicationContext().getResources();
-    }
+//    @Implementation
+//    public Resources getResources() {
+//        return realContextWrapper.getApplicationContext().getResources();
+//    }
 
-    @Implementation
-    public ContentResolver getContentResolver() {
-        return getApplicationContext().getContentResolver();
-    }
+//    @Implementation
+//    public ContentResolver getContentResolver() {
+//        return getApplicationContext().getContentResolver();
+//    }
 
-    @Implementation
-    public Object getSystemService(String name) {
-        return getApplicationContext().getSystemService(name);
-    }
+//    @Implementation
+//    public Object getSystemService(String name) {
+//        return getApplicationContext().getSystemService(name);
+//    }
 
     @Implementation
     public void sendBroadcast(Intent intent) {
-        getApplicationContext().sendBroadcast(intent);
+        realContextWrapper.getApplicationContext().sendBroadcast(intent);
     }
 
     public List<Intent> getBroadcastIntents() {
-        return ((ShadowApplication) shadowOf(getApplicationContext())).getBroadcastIntents();
+        return ((ShadowApplication) shadowOf(realContextWrapper.getApplicationContext())).getBroadcastIntents();
     }
 
     @Implementation
@@ -177,12 +176,12 @@ public class ShadowContextWrapper extends ShadowContext {
 
     @Implementation
     public Intent registerReceiver(BroadcastReceiver receiver, IntentFilter filter) {
-        return ((ShadowApplication) shadowOf(getApplicationContext())).registerReceiverWithContext(receiver, filter, realContextWrapper);
+        return ((ShadowApplication) shadowOf(realContextWrapper.getApplicationContext())).registerReceiverWithContext(receiver, filter, realContextWrapper);
     }
 
     @Implementation
     public void unregisterReceiver(BroadcastReceiver broadcastReceiver) {
-        getApplicationContext().unregisterReceiver(broadcastReceiver);
+        realContextWrapper.getApplicationContext().unregisterReceiver(broadcastReceiver);
     }
 
     @Implementation
@@ -192,7 +191,7 @@ public class ShadowContextWrapper extends ShadowContext {
 
     @Implementation
     public String getPackageName() {
-        return realContextWrapper == getApplicationContext() ? packageName : getApplicationContext().getPackageName();
+        return realContextWrapper == realContextWrapper.getApplicationContext() ? packageName : realContextWrapper.getApplicationContext().getPackageName();
     }
 
     @Implementation
@@ -220,7 +219,7 @@ public class ShadowContextWrapper extends ShadowContext {
      */
     @Implementation
     public PackageManager getPackageManager() {
-        return realContextWrapper == getApplicationContext() ? requirePackageManager() : getApplicationContext().getPackageManager();
+        return realContextWrapper == realContextWrapper.getApplicationContext() ? requirePackageManager() : realContextWrapper.getApplicationContext().getPackageManager();
     }
 
     private PackageManager requirePackageManager() {
@@ -232,17 +231,17 @@ public class ShadowContextWrapper extends ShadowContext {
 
     @Implementation
     public ComponentName startService(Intent service) {
-        return getApplicationContext().startService(service);
+        return realContextWrapper.getApplicationContext().startService(service);
     }
 
     @Implementation
     public boolean stopService(Intent name) {
-        return getApplicationContext().stopService(name);
+        return realContextWrapper.getApplicationContext().stopService(name);
     }
 
     @Implementation
     public void startActivity(Intent intent) {
-        getApplicationContext().startActivity(intent);
+        realContextWrapper.getApplicationContext().startActivity(intent);
     }
 
     @Implementation
@@ -337,17 +336,12 @@ public class ShadowContextWrapper extends ShadowContext {
     }
 
     @Implementation
-    public Context getBaseContext() {
-        return baseContext;
-    }
-
-    @Implementation
-    public void attachBaseContext(Context context) {
-        baseContext = context;
+    public void callAttachBaseContext(Context context) {
+        directlyOn(realContextWrapper, ContextWrapper.class, "attachBaseContext", Context.class).invoke(context);
     }
 
     public ShadowApplication getShadowApplication() {
-        return ((ShadowApplication) shadowOf(getApplicationContext()));
+        return ((ShadowApplication) shadowOf(realContextWrapper.getApplicationContext()));
     }
 
     @Implementation

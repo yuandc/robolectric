@@ -183,6 +183,7 @@ public class ActivityTest {
                 transcript.add("onContentChanged was called; title is \"" + shadowOf(findViewById(R.id.title)).innerText() + "\"");
             }
         };
+        shadowOf(customActivity).callAttachBaseContext(Robolectric.application);
         customActivity.setContentView(R.layout.main);
         transcript.assertEventsSoFar("onContentChanged was called; title is \"Main Layout\"");
     }
@@ -361,7 +362,7 @@ public class ActivityTest {
         assertEquals("Hello", string);
 
         int id = activity.getResources().getIdentifier("hello", "string", "org.robolectric");
-        assertTrue(id > 0);
+        assertThat(id).isEqualTo(R.string.hello);
 
         String hello = activity.getResources().getString(id);
         assertEquals("Hello", hello);
@@ -372,7 +373,7 @@ public class ActivityTest {
         Activity activity = new Activity();
 
         int id = activity.getResources().getIdentifier("just_alot_of_crap", "string", "org.robolectric");
-        assertTrue(id == 0);
+        assertThat(id).isEqualTo(0);
     }
 
     @Test

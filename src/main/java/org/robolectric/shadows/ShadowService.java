@@ -28,7 +28,7 @@ public class ShadowService extends ShadowContextWrapper {
         return Robolectric.application;
     }
 
-    @Implementation @Override
+    @Implementation
     public Context getApplicationContext() {
         return Robolectric.application;
     }

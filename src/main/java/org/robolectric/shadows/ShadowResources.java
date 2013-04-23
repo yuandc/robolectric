@@ -1,6 +1,7 @@
 package org.robolectric.shadows;
 
 import android.content.res.AssetManager;
+import android.content.res.BridgeTypedArray;
 import android.content.res.ColorStateList;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -15,7 +16,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.internal.Implementation;
 import org.robolectric.internal.Implements;
 import org.robolectric.internal.RealObject;
-import org.robolectric.res.Attribute;
 import org.robolectric.res.DrawableNode;
 import org.robolectric.res.ResName;
 import org.robolectric.res.ResourceIndex;
@@ -25,10 +25,8 @@ import org.robolectric.res.builder.XmlFileBuilder;
 import org.w3c.dom.Document;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Locale;
 
-import static org.robolectric.Robolectric.newInstanceOf;
 import static org.robolectric.Robolectric.shadowOf;
 
 /**
@@ -292,10 +290,10 @@ public class ShadowResources {
         return parser;
     }
 
-    @Implementation
-    public final android.content.res.Resources.Theme newTheme() {
-        return inject(realResources, newInstanceOf(Resources.Theme.class));
-    }
+//    @Implementation
+//    public final android.content.res.Resources.Theme newTheme() {
+//        return inject(realResources, newInstanceOf(Resources.Theme.class));
+//    }
 
     public ResourceLoader getResourceLoader() {
         return resourceLoader;
@@ -313,24 +311,30 @@ public class ShadowResources {
             this.resources = resources;
         }
 
-        @Implementation
-        public TypedArray obtainStyledAttributes(int[] attrs) {
-            return obtainStyledAttributes(0, attrs);
-        }
+//        @Implementation
+//        public TypedArray obtainStyledAttributes(int[] attrs) {
+//            return obtainStyledAttributes(0, attrs);
+//        }
+//
+//        @Implementation
+//        public TypedArray obtainStyledAttributes(int resid, int[] attrs) throws android.content.res.Resources.NotFoundException {
+//            return obtainStyledAttributes(null, attrs, 0, 0);
+//        }
+//
+//        @Implementation
+//        public TypedArray obtainStyledAttributes(AttributeSet set, int[] attrs, int defStyleAttr, int defStyleRes) {
+//            if (set == null) {
+//                set = new RoboAttributeSet(new ArrayList<Attribute>(), shadowOf(resources).getResourceLoader(), null);
+//            }
+//
+//            return ShadowTypedArray.create(resources, set, attrs);
+//        }
 
-        @Implementation
-        public TypedArray obtainStyledAttributes(int resid, int[] attrs) throws android.content.res.Resources.NotFoundException {
-            return obtainStyledAttributes(null, attrs, 0, 0);
-        }
-
-        @Implementation
+        // fucking android
         public TypedArray obtainStyledAttributes(AttributeSet set, int[] attrs, int defStyleAttr, int defStyleRes) {
-            if (set == null) {
-                set = new RoboAttributeSet(new ArrayList<Attribute>(), shadowOf(resources).getResourceLoader(), null);
-            }
-
-            return ShadowTypedArray.create(resources, set, attrs);
+            return new BridgeTypedArray();
         }
+
     }
 
     @Implementation

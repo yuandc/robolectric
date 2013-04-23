@@ -3,8 +3,6 @@ package org.robolectric.shadows;
 import android.app.Application;
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.util.AttributeSet;
 import android.view.View;
 import org.robolectric.internal.Implementation;
 import org.robolectric.internal.Implements;
@@ -63,34 +61,34 @@ abstract public class ShadowContext {
         return realContext.getResources().getString(resId, formatArgs);
     }
 
-    @Implementation
-    abstract public Resources.Theme getTheme();
+//    @Implementation
+//    abstract public Resources.Theme getTheme();
 
-    @Implementation
-    public final TypedArray obtainStyledAttributes(int[] attrs) {
-        return getTheme().obtainStyledAttributes(attrs);
-    }
+//    @Implementation
+//    public final TypedArray obtainStyledAttributes(int[] attrs) {
+//        return getTheme().obtainStyledAttributes(attrs);
+//    }
+//
+//    @Implementation
+//    public final TypedArray obtainStyledAttributes(int resid, int[] attrs) throws Resources.NotFoundException {
+//        return getTheme().obtainStyledAttributes(resid, attrs);
+//    }
 
-    @Implementation
-    public final TypedArray obtainStyledAttributes(int resid, int[] attrs) throws Resources.NotFoundException {
-        return getTheme().obtainStyledAttributes(resid, attrs);
-    }
+//    @Implementation
+//    public final TypedArray obtainStyledAttributes(AttributeSet set, int[] attrs) {
+//        if (set == null) {
+//            return getTheme().obtainStyledAttributes(attrs);
+//        }
+//
+//        return ShadowTypedArray.create(realContext.getResources(), set, attrs);
+//    }
 
-    @Implementation
-    public final TypedArray obtainStyledAttributes(AttributeSet set, int[] attrs) {
-        if (set == null) {
-            return getTheme().obtainStyledAttributes(attrs);
-        }
-
-        return ShadowTypedArray.create(realContext.getResources(), set, attrs);
-    }
-
-    @Implementation
-    public final TypedArray obtainStyledAttributes(
-            AttributeSet set, int[] attrs, int defStyleAttr, int defStyleRes) {
-        return getTheme().obtainStyledAttributes(
-                set, attrs, defStyleAttr, defStyleRes);
-    }
+//    @Implementation
+//    public final TypedArray obtainStyledAttributes(
+//            AttributeSet set, int[] attrs, int defStyleAttr, int defStyleRes) {
+//        return getTheme().obtainStyledAttributes(
+//                set, attrs, defStyleAttr, defStyleRes);
+//    }
 
     public RoboAttributeSet createAttributeSet(List<Attribute> attributes, Class<? extends View> viewClass) {
         RoboAttributeSet attributeSet = new RoboAttributeSet(attributes, getResourceLoader(), viewClass);

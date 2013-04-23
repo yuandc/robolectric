@@ -1,7 +1,6 @@
 package org.robolectric.shadows;
 
 import android.app.Application;
-import android.app.SearchManager;
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -11,15 +10,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
-import android.os.storage.StorageManager;
 import android.view.LayoutInflater;
 import android.widget.Toast;
+import com.android.ide.common.resources.ResourceRepository;
 import org.robolectric.AndroidManifest;
 import org.robolectric.Robolectric;
 import org.robolectric.internal.Implementation;
@@ -36,7 +33,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static org.fest.reflect.core.Reflection.constructor;
 import static org.robolectric.Robolectric.newInstanceOf;
 import static org.robolectric.Robolectric.shadowOf;
 
@@ -109,6 +105,8 @@ public class ShadowApplication extends ShadowContextWrapper {
     private List<String> unbindableActions = new ArrayList<String>();
 
     private boolean strictI18n = false;
+    private ResourceRepository systemResourceRepository;
+    private ResourceRepository packageResourceRepository;
 
     /**
      * Associates a {@code ResourceLoader} with an {@code Application} instance
@@ -128,6 +126,12 @@ public class ShadowApplication extends ShadowContextWrapper {
             setPackageManager(new RobolectricPackageManager(realApplication, appManifest));
             this.registerBroadcastReceivers(appManifest);
         }
+    }
+
+    public void bind(AndroidManifest appManifest, ResourceLoader resourceLoader, ResourceRepository systemResourceRepository, ResourceRepository packageResourceRepository) {
+        bind(appManifest, resourceLoader);
+        this.systemResourceRepository = systemResourceRepository;
+        this.packageResourceRepository = packageResourceRepository;
     }
 
     private void registerBroadcastReceivers(AndroidManifest androidManifest) {
@@ -161,7 +165,6 @@ public class ShadowApplication extends ShadowContextWrapper {
         return backgroundScheduler;
     }
 
-    @Override
     @Implementation
     public Context getApplicationContext() {
         return realApplication;
@@ -176,14 +179,15 @@ public class ShadowApplication extends ShadowContextWrapper {
         return assetManager;
     }
 
-    @Override
-    @Implementation
-    public Resources getResources() {
-        if (resources == null ) {
-            resources = ShadowResources.bind(new Resources(realApplication.getAssets(), null, new Configuration()), resourceLoader);
-        }
-        return resources;
-    }
+//    @Override
+//    @Implementation
+//    public Resources getResources() {
+//        new Resources(realApplication.getAssets(), null, new Configuration())
+//        if (resources == null ) {
+//            resources = ShadowResources.bind(new Resources(realApplication.getAssets(), null, new Configuration()), resourceLoader);
+//        }
+//        return resources;
+//    }
 
     /**
      * Reset (set to null) resources instance, so they will be reloaded next time they are
@@ -194,7 +198,6 @@ public class ShadowApplication extends ShadowContextWrapper {
     }
 
     @Implementation
-    @Override
     public ContentResolver getContentResolver() {
         if (contentResolver == null) {
             contentResolver = new ContentResolver(realApplication) {
@@ -203,39 +206,39 @@ public class ShadowApplication extends ShadowContextWrapper {
         return contentResolver;
     }
 
-    @Implementation
-    @Override
-    public Object getSystemService(String name) {
-        if (name.equals(Context.LAYOUT_INFLATER_SERVICE)) {
-            return LayoutInflater.from(realApplication);
-        }
+//    @Implementation
+//    @Override
+//    public Object getSystemService(String name) {
+//        if (name.equals(Context.LAYOUT_INFLATER_SERVICE)) {
+//            return LayoutInflater.from(realApplication);
+//        }
+//
+//        Object service = systemServices.get(name);
+//        if (service == null) {
+//            String serviceClassName = SYSTEM_SERVICE_MAP.get(name);
+//            if (serviceClassName == null) {
+//                System.err.println("WARNING: unknown service " + name);
+//                return null;
+//            }
+//
+//            if (serviceClassName.equals(SearchManager.class.getName())) {
+//                service = constructor().withParameterTypes(Context.class, Handler.class).in(SearchManager.class)
+//                        .newInstance(realApplication, null);
+//            } else if (serviceClassName.equals(StorageManager.class.getName())) {
+//                service = constructor().withParameterTypes(Looper.class).in(StorageManager.class)
+//                        .newInstance((Object) null);
+//            } else {
+//                try {
+//                    service = newInstanceOf(Class.forName(serviceClassName));
+//                } catch (ClassNotFoundException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            }
+//            systemServices.put(name, service);
+//        }
+//        return service;
+//    }
 
-        Object service = systemServices.get(name);
-        if (service == null) {
-            String serviceClassName = SYSTEM_SERVICE_MAP.get(name);
-            if (serviceClassName == null) {
-                System.err.println("WARNING: unknown service " + name);
-                return null;
-            }
-
-            if (serviceClassName.equals(SearchManager.class.getName())) {
-                service = constructor().withParameterTypes(Context.class, Handler.class).in(SearchManager.class)
-                        .newInstance(realApplication, null);
-            } else if (serviceClassName.equals(StorageManager.class.getName())) {
-                service = constructor().withParameterTypes(Looper.class).in(StorageManager.class)
-                        .newInstance((Object) null);
-            } else {
-                try {
-                    service = newInstanceOf(Class.forName(serviceClassName));
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            systemServices.put(name, service);
-        }
-        return service;
-    }
-    
     @Implementation
     @Override
     public void startActivity(Intent intent) {

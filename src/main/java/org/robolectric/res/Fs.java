@@ -4,7 +4,6 @@ import org.robolectric.util.Join;
 import org.robolectric.util.Util;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -86,10 +85,10 @@ abstract public class Fs {
                 return fsFiles.toArray(new FsFile[fsFiles.size()]);
             }
 
-            @Override public FsFile[] listFiles(FileFilter fileFilter) {
+            @Override public FsFile[] listFiles(Filter filter) {
                 List<FsFile> filteredFsFiles = new ArrayList<FsFile>();
                 for (FsFile fsFile : listFiles()) {
-                    if (fileFilter.accept(new File(((JarFsFile) fsFile).path))) {
+                    if (filter.accept(fsFile)) {
                         filteredFsFiles.add(fsFile);
                     }
                 }
@@ -132,6 +131,10 @@ abstract public class Fs {
                 return dotIndex >= 0 ? name.substring(0, dotIndex) : name;
             }
 
+            @Override public String getPath() {
+                return "jar:" + getJarFileName() + "!/" + path;
+            }
+
             @Override
             public boolean equals(Object o) {
                 if (this == o) return true;
@@ -155,7 +158,7 @@ abstract public class Fs {
             }
 
             @Override public String toString() {
-                return "jar:" + getJarFileName() + "!/" + path;
+                return getPath();
             }
         }
     }

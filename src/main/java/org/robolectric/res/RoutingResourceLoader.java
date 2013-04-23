@@ -1,6 +1,7 @@
 package org.robolectric.res;
 
 import android.view.View;
+import com.android.ide.common.resources.FrameworkResources;
 import org.w3c.dom.Document;
 
 import java.io.InputStream;
@@ -11,6 +12,7 @@ import java.util.Set;
 public class RoutingResourceLoader implements ResourceLoader {
     private final Map<String, ResourceLoader> resourceLoaders;
     private final ResourceIndex resourceIndex;
+    private FrameworkResources frameworkResources;
 
     public RoutingResourceLoader(Map<String, ResourceLoader> resourceLoaders) {
         this.resourceLoaders = resourceLoaders;
@@ -131,6 +133,14 @@ public class RoutingResourceLoader implements ResourceLoader {
             throw new RuntimeException("no ResourceLoader found for " + namespace);
         }
         return resourceLoader;
+    }
+
+    public void setFrameworkResources(FrameworkResources frameworkResources) {
+        this.frameworkResources = frameworkResources;
+    }
+
+    public FrameworkResources getFrameworkResources() {
+        return frameworkResources;
     }
 
     private static class NullResourceLoader extends XResourceLoader {

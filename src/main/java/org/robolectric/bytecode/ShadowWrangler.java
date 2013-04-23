@@ -286,21 +286,13 @@ public class ShadowWrangler implements ClassHandler {
             System.out.println("creating new " + shadowClassName + " as shadow for " + instance.getClass().getName());
         try {
             Class<?> shadowClass = loadClass(shadowClassName, instance.getClass().getClassLoader());
-            Constructor<?> constructor = findConstructor(instance, shadowClass);
-            if (constructor != null) {
-                shadow = constructor.newInstance(instance);
-            } else {
-                shadow = shadowClass.newInstance();
-            }
-
+            shadow = shadowClass.newInstance();
             injectRealObjectOn(shadow, shadowClass, instance);
 
             return shadow;
         } catch (InstantiationException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
             throw new RuntimeException(e);
         }
     }

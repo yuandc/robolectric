@@ -58,7 +58,7 @@ public class AsmInstrumentingClassLoader extends ClassLoader implements Opcodes,
     private static final String ROBO_INIT_METHOD_NAME = "$$robo$init";
     static final String GET_ROBO_DATA_METHOD_NAME = "$$robo$getData";
 
-    private static boolean debug = false;
+    private static boolean debug = true;
 
     private final Setup setup;
     private final URLClassLoader urls;

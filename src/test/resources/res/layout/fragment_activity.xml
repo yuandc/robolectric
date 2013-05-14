@@ -2,7 +2,6 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fragment_container"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -12,7 +11,7 @@
   <fragment
       android:id="@+id/fragment"
       android:tag="fragment_tag"
-      android:name="org.robolectric.shadows.TestFragment"
+      android:name="org.robolectric.util.FragmentTestUtilTest$TestFragment"
       />
 
   <LinearLayout

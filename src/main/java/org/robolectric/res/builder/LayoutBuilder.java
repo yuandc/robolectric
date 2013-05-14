@@ -26,6 +26,7 @@ import static org.robolectric.res.ResourceLoader.ANDROID_NS;
 
 public class LayoutBuilder {
   public static final ResName ATTR_LAYOUT = new ResName(":attr/layout");
+  private static final ResName ANDROID_NAME_ATTR = new ResName("android", "attr", "name");
 
   private final ResourceLoader resourceLoader;
 
@@ -117,7 +118,8 @@ public class LayoutBuilder {
     List<Attribute> attributes = viewNode.getAttributes();
     AttributeSet attributeSet = shadowOf(context).createAttributeSet(attributes, View.class);
 
-    Class<? extends Fragment> clazz = loadFragmentClass(Attribute.find(attributes, "android:attr/name").value);
+    Attribute attribute = Attribute.find(attributes, ANDROID_NAME_ATTR);
+    Class<? extends Fragment> clazz = loadFragmentClass(attribute.value);
     Fragment fragment;
     try {
       fragment = ((Constructor<? extends Fragment>) clazz.getConstructor()).newInstance();

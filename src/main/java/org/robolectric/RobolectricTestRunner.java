@@ -2,10 +2,32 @@ package org.robolectric;
 
 import android.app.Application;
 import android.os.Build;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import org.apache.maven.artifact.ant.DependenciesTask;
 import org.jetbrains.annotations.TestOnly;
+import org.junit.Rule;
+import org.junit.runner.Description;
+import org.junit.runner.manipulation.Filter;
+import org.junit.runner.manipulation.NoTestsRemainException;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.ParentRunner;
+import org.junit.runners.model.FrameworkField;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -32,24 +54,11 @@ import org.robolectric.res.ResourcePath;
 import org.robolectric.res.RoutingResourceLoader;
 import org.robolectric.shadows.ShadowLog;
 import org.robolectric.util.AnnotationUtil;
+import org.robolectric.util.CartesianJoin;
 import org.robolectric.util.DatabaseConfig.DatabaseMap;
 import org.robolectric.util.DatabaseConfig.UsingDatabaseMap;
+import org.robolectric.util.Join;
 import org.robolectric.util.SQLiteMap;
-
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 
 import static org.fest.reflect.core.Reflection.staticField;
 
@@ -58,7 +67,7 @@ import static org.fest.reflect.core.Reflection.staticField;
  * {@link org.robolectric.res.ResourceLoader} in order to
  * provide a simulation of the Android runtime environment.
  */
-public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
+public class RobolectricTestRunner extends ParentRunner {
   private static final MavenCentral MAVEN_CENTRAL = new MavenCentral();
 
   private static final Map<Class<? extends RobolectricTestRunner>, EnvHolder> envHoldersByTestRunner = new HashMap<Class<? extends RobolectricTestRunner>, EnvHolder>();
@@ -71,6 +80,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
   private static ShadowMap mainShadowMap;
 
   private final EnvHolder envHolder;
+  private final MyBlockJUnit4ClassRunner blockJUnit4ClassRunner;
   private DatabaseMap databaseMap;
   private TestLifecycle<Application> testLifecycle;
 
@@ -100,6 +110,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
     this.envHolder = envHolder;
 
     databaseMap = setupDatabaseMap(testClass, new SQLiteMap());
+    blockJUnit4ClassRunner = new MyBlockJUnit4ClassRunner(testClass);
   }
 
   private void assureTestLifecycle(SdkEnvironment sdkEnvironment) {
@@ -171,6 +182,93 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
     // maybe you want to override this method and some settings?
   }
 
+  private Object[][] calculateDatasets(List<TestData> testDatas) {
+    CartesianJoin cartesianJoin = new CartesianJoin();
+    for (TestData testData : testDatas) {
+      cartesianJoin.addDimension(testData.allValues());
+    }
+    return cartesianJoin.generateSolutions();
+  }
+
+  private List<TestData> getTestDatas() {
+    List<TestData> testDatas = new ArrayList<TestData>();
+
+    List<FrameworkField> rules = getTestClass().getAnnotatedFields(Rule.class);
+    for (FrameworkField rule : rules) {
+      Field field = rule.getField();
+      field.setAccessible(true);
+      if (field.getType().isAssignableFrom(TestData.class)) {
+        if (!Modifier.isStatic(field.getModifiers())) {
+          throw new RuntimeException(rule + " isn't static");
+        }
+
+        try {
+          testDatas.add((TestData) field.get(null));
+        } catch (IllegalAccessException e) {
+          throw new RuntimeException(e);
+        }
+      }
+    }
+    return testDatas;
+  }
+
+  @Override protected Description describeChild(Object method) {
+    FrameworkMethodWithData specialMethod = (FrameworkMethodWithData) method;
+    Description description = super.describeChild(specialMethod);
+    Collection<Annotation> annotations = description.getAnnotations();
+    Annotation[] annotationsArray = annotations.toArray(new Annotation[annotations.size()]);
+    return Description.createSuiteDescription(
+        description.getDisplayName() + " [" + Join.join(", ", specialMethod.getDataset()) + "]",
+        annotationsArray);
+  }
+
+  @Override protected void runChild(Object child, RunNotifier notifier) {
+
+  }
+
+  @Override protected List<Object> getChildren() {
+    List<TestData> testDatas = getTestDatas();
+    if (testDatas.size() == 0) {
+      return super.getChildren();
+    }
+
+    Object[][] datasets = calculateDatasets(testDatas);
+
+    List suites = new ArrayList();
+    for (Object[] dataset : datasets) {
+      try {
+        suites.add(new RobolectricTestRunner(getTestClass().getJavaClass()) {
+          @Override protected List<Object> getChildren() {
+            return super.getChildren();
+          }
+        };
+      } catch (InitializationError initializationError) {
+        throw new RuntimeException(initializationError);
+      }
+    }
+    return suites;
+  }
+
+  @Override protected List<FrameworkMethod> computeTestMethods() {
+    List<TestData> testDatas = getTestDatas();
+
+    List<FrameworkMethod> frameworkMethods = blockJUnit4ClassRunner.computeTestMethods();
+    if (testDatas.size() == 0) {
+      return frameworkMethods;
+    }
+
+    Object[][] datasets = calculateDatasets(testDatas);
+    for (Object[] dataset : datasets) {
+      List<FrameworkMethod> wrappedFrameworkMethods = new ArrayList<FrameworkMethod>();
+      for (FrameworkMethod actualMethod : frameworkMethods) {
+        wrappedFrameworkMethods.add(new FrameworkMethodWithData(actualMethod, testDatas, dataset));
+      }
+    }
+
+    return frameworkMethods;
+  }
+
+
   @Override
   protected Statement classBlock(RunNotifier notifier) {
     final Statement statement = super.classBlock(notifier);
@@ -207,7 +305,7 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
         final Method bootstrappedMethod;
         try {
           //noinspection unchecked
-          bootstrappedMethod = bootstrappedTestClass.getMethod(method.getName());
+          bootstrappedMethod = bootstrappedTestClass.getMethod(method.getMethod().getName());
         } catch (NoSuchMethodException e) {
           throw new RuntimeException(e);
         }
@@ -349,7 +447,8 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
 
   protected Properties getConfigProperties() {
     ClassLoader classLoader = getTestClass().getClass().getClassLoader();
-    InputStream resourceAsStream = classLoader.getResourceAsStream("org.robolectric.Config.properties");
+    InputStream resourceAsStream = classLoader.getResourceAsStream(
+        "org.robolectric.Config.properties");
     if (resourceAsStream == null) return null;
     Properties properties = new Properties();
     try {
@@ -389,7 +488,8 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
   }
 
   protected void setUpApplicationState(Method method, ParallelUniverseInterface parallelUniverseInterface, boolean strictI18n, ResourceLoader systemResourceLoader, AndroidManifest appManifest) {
-    parallelUniverseInterface.setUpApplicationState(method, testLifecycle, strictI18n, systemResourceLoader, appManifest);
+    parallelUniverseInterface.setUpApplicationState(method, testLifecycle, strictI18n,
+        systemResourceLoader, appManifest);
   }
 
   private int getTargetSdkVersion(AndroidManifest appManifest) {
@@ -664,6 +764,16 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
     }
   }
 
+  private static class MyBlockJUnit4ClassRunner extends BlockJUnit4ClassRunner {
+    public MyBlockJUnit4ClassRunner(Class<?> testClass) throws InitializationError {
+      super(testClass);
+    }
+
+    @Override protected List<FrameworkMethod> computeTestMethods() {
+      return super.computeTestMethods();
+    }
+  }
+
   public class HelperTestRunner extends BlockJUnit4ClassRunner {
     public HelperTestRunner(Class<?> testClass) throws InitializationError {
       super(testClass);
@@ -681,6 +791,23 @@ public class RobolectricTestRunner extends BlockJUnit4ClassRunner {
 
     @Override public Statement methodBlock(FrameworkMethod method) {
       return super.methodBlock(method);
+    }
+  }
+
+  private static class FrameworkMethodWithData extends FrameworkMethod {
+    private final FrameworkMethod original;
+    private final List<TestData> testDatas;
+    private final Object[] dataset;
+
+    public FrameworkMethodWithData(FrameworkMethod original, List<TestData> testDatas, Object[] dataset) {
+      super(original.getMethod());
+      this.original = original;
+      this.testDatas = testDatas;
+      this.dataset = dataset;
+    }
+
+    public Object[] getDataset() {
+      return dataset;
     }
   }
 }

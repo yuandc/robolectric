@@ -49,10 +49,10 @@ public class ViewNode {
     return attributes;
   }
 
-  @Override
-  public String toString() {
+  @Override public String toString() {
     return "ViewNode{" +
         "name='" + name + '\'' +
+        ", xmlContext=" + xmlContext +
         '}';
   }
 

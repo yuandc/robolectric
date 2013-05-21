@@ -37,7 +37,14 @@ public class LayoutBuilder {
     if (viewNode.isInclude()) {
       List<Attribute> viewNodeAttributes = viewNode.getAttributes();
       Attribute layoutAttribute = Attribute.find(viewNodeAttributes, ATTR_LAYOUT);
-      return inflateView(context, layoutAttribute.getResourceReference(), viewNodeAttributes, parent, qualifiers);
+      View view = inflateView(context, layoutAttribute.getResourceReference(), viewNodeAttributes, parent, qualifiers);
+      if (parent != null) {
+        ViewGroup.LayoutParams params = parent.generateLayoutParams(createAttributeSetFor(viewNode, context));
+        if (params != null) {
+          view.setLayoutParams(params);
+        }
+      }
+      return view;
     } else {
       View view = create(viewNode, context, parent);
 
@@ -162,9 +169,11 @@ public class LayoutBuilder {
     try {
       Constructor<? extends View> constructor;
       try {
-        RoboAttributeSet attributeSet = shadowOf(context).createAttributeSet(viewNode.getAttributes(), View.class);
+        RoboAttributeSet attributeSet = createAttributeSetFor(viewNode, context);
         constructor = clazz.getConstructor(Context.class, AttributeSet.class);
-        return constructor.newInstance(context, attributeSet);
+        View view = constructor.newInstance(context, attributeSet);
+        shadowOf(view).setSourceViewNode(viewNode);
+        return view;
       } catch (NoSuchMethodException e) {
         try {
           constructor = clazz.getConstructor(Context.class);
@@ -183,6 +192,10 @@ public class LayoutBuilder {
     } catch (NoSuchMethodException e) {
       throw new RuntimeException("Failed to create a " + clazz.getName(), e);
     }
+  }
+
+  private static RoboAttributeSet createAttributeSetFor(ViewNode viewNode, Context context) {
+    return shadowOf(context).createAttributeSet(viewNode.getAttributes(), View.class);
   }
 
   private Class<? extends View> pickViewClass(ViewNode viewNode) {

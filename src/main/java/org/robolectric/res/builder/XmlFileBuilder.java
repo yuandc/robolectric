@@ -3,7 +3,10 @@ package org.robolectric.res.builder;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
 import org.robolectric.res.Attribute;
+import org.robolectric.res.Fs;
+import org.robolectric.res.FsFile;
 import org.robolectric.res.ResName;
+import org.robolectric.res.XmlFileLoader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -48,6 +51,14 @@ public class XmlFileBuilder {
     return false;
   }
 
+  public static XmlResourceParser getXmlResourceParser(String file, String packageName, Resources resources) {
+   FsFile fsFile = Fs.fileFromPath(file);
+   Document document = new XmlFileLoader(null).parse(fsFile);
+   if (document == null) {
+     throw new Resources.NotFoundException("couldn't find resource " + fsFile.getPath());
+   }
+   return new XmlFileBuilder().getXml(document, fsFile.getPath(), packageName, resources);
+ }
 
   public XmlResourceParser getXml(Document document, String fileName, String packageName, Resources resources) {
     return new XmlResourceParserImpl(document, fileName, packageName, resources);

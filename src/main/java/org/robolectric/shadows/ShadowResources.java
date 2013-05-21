@@ -13,16 +13,20 @@ import android.util.DisplayMetrics;
 import android.util.LongSparseArray;
 import android.util.TypedValue;
 import android.view.Display;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import org.jetbrains.annotations.NotNull;
 import org.robolectric.Robolectric;
-import org.robolectric.internal.HiddenApi;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.annotation.RealObject;
+import org.robolectric.internal.HiddenApi;
 import org.robolectric.res.Attribute;
 import org.robolectric.res.DrawableNode;
-import org.robolectric.res.Fs;
-import org.robolectric.res.FsFile;
 import org.robolectric.res.Plural;
 import org.robolectric.res.ResName;
 import org.robolectric.res.ResType;
@@ -30,18 +34,10 @@ import org.robolectric.res.ResourceIndex;
 import org.robolectric.res.ResourceLoader;
 import org.robolectric.res.Style;
 import org.robolectric.res.TypedResource;
-import org.robolectric.res.XmlFileLoader;
 import org.robolectric.res.builder.DrawableBuilder;
 import org.robolectric.res.builder.XmlFileBuilder;
 import org.robolectric.util.Util;
 import org.w3c.dom.Document;
-
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import static org.fest.reflect.core.Reflection.field;
 import static org.robolectric.Robolectric.directlyOn;
@@ -281,7 +277,11 @@ public class ShadowResources {
 
   @Implementation
   public void updateConfiguration(Configuration config, DisplayMetrics metrics) {
-    shadowOf(realResources.getAssets()).setQualifiers(shadowOf(config).getQualifiers());
+    if (config != null) {
+      String qualifiers = shadowOf(config).getQualifiers();
+      shadowOf(realResources.getAssets()).setQualifiers(qualifiers);
+    }
+
     directlyOn(realResources, Resources.class).updateConfiguration(config, metrics);
   }
 
@@ -346,7 +346,8 @@ public class ShadowResources {
     Plural plural = resourceLoader.getPlural(resName, quantity, getQualifiers());
     String string = plural.getString();
     ShadowAssetManager shadowAssetManager = shadowOf(realResources.getAssets());
-    TypedResource typedResource = shadowAssetManager.resolve(new TypedResource(string, ResType.CHAR_SEQUENCE), getQualifiers(),
+    TypedResource typedResource = shadowAssetManager.resolve(
+        new TypedResource(string, ResType.CHAR_SEQUENCE), getQualifiers(),
         new ResName(resName.packageName, "string", resName.name));
     return typedResource == null ? null : typedResource.asString();
   }
@@ -394,21 +395,12 @@ public class ShadowResources {
 
   @HiddenApi @Implementation
   public XmlResourceParser loadXmlResourceParser(String file, int id, int assetCookie, String type) throws Resources.NotFoundException {
-    FsFile fsFile = Fs.fileFromPath(file);
-    Document document = new XmlFileLoader(null).parse(fsFile);
-    if (document == null) {
-      throw new Resources.NotFoundException(notFound(id));
-    }
     String packageName = getResName(id).packageName;
-    return new XmlFileBuilder().getXml(document, fsFile.getPath(), packageName, realResources);
+    return XmlFileBuilder.getXmlResourceParser(file, packageName, realResources);
   }
 
   public ResourceLoader getResourceLoader() {
     return resourceLoader;
-  }
-
-  private String notFound(int id) {
-    return "couldn't find resource " + getResName(id).getFullyQualifiedName();
   }
 
   @Implements(Resources.Theme.class)

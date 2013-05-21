@@ -11,6 +11,7 @@ import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.annotation.RealObject;
 
+import static org.fest.reflect.core.Reflection.field;
 import static org.robolectric.Robolectric.shadowOf;
 
 /**
@@ -98,7 +99,8 @@ public class ShadowHandler {
 
   @Implementation
   public final boolean sendMessageDelayed(final Message msg, long delayMillis) {
-    Robolectric.shadowOf(msg).setWhen(getCurrentUptimeMillis() + delayMillis);
+    long when = getCurrentUptimeMillis() + delayMillis;
+    setMessageWhen(msg, when);
     messages.add(msg);
     postDelayed(new Runnable() {
       @Override
@@ -110,6 +112,10 @@ public class ShadowHandler {
       }
     }, delayMillis);
     return true;
+  }
+
+  private void setMessageWhen(Message msg, long when) {
+    field("when").ofType(long.class).in(msg).set(when);
   }
 
   private void routeMessage(Message msg) {
@@ -134,7 +140,7 @@ public class ShadowHandler {
 
   @Implementation
   public final boolean sendMessageAtFrontOfQueue(final Message msg) {
-    Robolectric.shadowOf(msg).setWhen(getCurrentUptimeMillis());
+    setMessageWhen(msg, getCurrentUptimeMillis());
     messages.add(0, msg);
     postAtFrontOfQueue(new Runnable() {
       @Override

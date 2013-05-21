@@ -84,7 +84,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.os.Message;
 import android.os.Parcel;
 import android.os.PowerManager;
 import android.os.ResultReceiver;
@@ -163,6 +162,9 @@ import android.widget.VideoView;
 import android.widget.ViewAnimator;
 import android.widget.ViewFlipper;
 import android.widget.ZoomButtonsController;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.List;
 import org.apache.http.Header;
 import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
@@ -272,7 +274,6 @@ import org.robolectric.shadows.ShadowMediaRecorder;
 import org.robolectric.shadows.ShadowMediaStore;
 import org.robolectric.shadows.ShadowMenuInflater;
 import org.robolectric.shadows.ShadowMergeCursor;
-import org.robolectric.shadows.ShadowMessage;
 import org.robolectric.shadows.ShadowMimeTypeMap;
 import org.robolectric.shadows.ShadowMotionEvent;
 import org.robolectric.shadows.ShadowNetworkInfo;
@@ -348,10 +349,6 @@ import org.robolectric.tester.org.apache.http.HttpRequestInfo;
 import org.robolectric.tester.org.apache.http.RequestMatcher;
 import org.robolectric.util.ActivityController;
 import org.robolectric.util.Scheduler;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.List;
 
 import static org.fest.reflect.core.Reflection.method;
 
@@ -803,10 +800,6 @@ public class Robolectric {
 
   public static ShadowMergeCursor shadowOf(MergeCursor instance) {
     return (ShadowMergeCursor) shadowOf_(instance);
-  }
-
-  public static ShadowMessage shadowOf(Message instance) {
-    return (ShadowMessage) shadowOf_(instance);
   }
 
   public static ShadowMimeTypeMap shadowOf(MimeTypeMap instance) {

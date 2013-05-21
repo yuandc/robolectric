@@ -3,14 +3,13 @@ package org.robolectric.shadows;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.annotation.RealObject;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 import static org.robolectric.Robolectric.shadowOf;
 
@@ -99,7 +98,7 @@ public class ShadowHandler {
 
   @Implementation
   public final boolean sendMessageDelayed(final Message msg, long delayMillis) {
-    Robolectric.shadowOf(msg).setWhen(Robolectric.shadowOf(looper).getScheduler().getCurrentTime()+delayMillis);
+    Robolectric.shadowOf(msg).setWhen(getCurrentUptimeMillis() + delayMillis);
     messages.add(msg);
     postDelayed(new Runnable() {
       @Override
@@ -135,7 +134,7 @@ public class ShadowHandler {
 
   @Implementation
   public final boolean sendMessageAtFrontOfQueue(final Message msg) {
-    Robolectric.shadowOf(msg).setWhen(Robolectric.shadowOf(looper).getScheduler().getCurrentTime());
+    Robolectric.shadowOf(msg).setWhen(getCurrentUptimeMillis());
     messages.add(0, msg);
     postAtFrontOfQueue(new Runnable() {
       @Override
@@ -151,7 +150,7 @@ public class ShadowHandler {
 
   @Implementation
   public boolean sendMessageAtTime(Message msg, long uptimeMillis) {
-    long delay = uptimeMillis - System.currentTimeMillis();
+    long delay = uptimeMillis - getCurrentUptimeMillis();
     sendMessageDelayed(msg, delay);
     return true;
   }
@@ -238,5 +237,9 @@ public class ShadowHandler {
    */
   public static void runMainLooperToNextTask() {
     shadowOf(Looper.myLooper()).runToNextTask();
+  }
+
+  private long getCurrentUptimeMillis() {
+    return Robolectric.shadowOf(looper).getScheduler().getCurrentTime();
   }
 }

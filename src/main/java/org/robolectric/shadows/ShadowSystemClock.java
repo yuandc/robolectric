@@ -1,16 +1,18 @@
 package org.robolectric.shadows;
 
 import android.os.SystemClock;
-import org.robolectric.internal.HiddenApi;
+import org.robolectric.Robolectric;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
+import org.robolectric.internal.HiddenApi;
 
 @Implements(value = SystemClock.class, callThroughByDefault = true)
 public class ShadowSystemClock {
   private static long bootedAt = now();
+  private static long nanoTime = 0;
 
   private static long now() {
-    return System.currentTimeMillis();
+    return Robolectric.getUiThreadScheduler().getCurrentTime();
   }
 
   @Implementation
@@ -41,5 +43,13 @@ public class ShadowSystemClock {
   @HiddenApi @Implementation
   public static long currentTimeMicro() {
     return now() * 1000;
+  }
+
+  public static long nanoTime() {
+    return nanoTime++;
+  }
+
+  public static void setNanoTime(long nanoTime) {
+    ShadowSystemClock.nanoTime = nanoTime;
   }
 }

@@ -318,6 +318,7 @@ import org.robolectric.shadows.ShadowSmsManager;
 import org.robolectric.shadows.ShadowSslErrorHandler;
 import org.robolectric.shadows.ShadowStatFs;
 import org.robolectric.shadows.ShadowStateListDrawable;
+import org.robolectric.shadows.ShadowSystemClock;
 import org.robolectric.shadows.ShadowTabHost;
 import org.robolectric.shadows.ShadowTelephonyManager;
 import org.robolectric.shadows.ShadowTextPaint;
@@ -1401,6 +1402,7 @@ public class Robolectric {
   public static void reset() {
     Robolectric.application = null;
     ShadowAccountManager.reset();
+    ShadowSystemClock.setNanoTime(0);
     ShadowResources.reset();
     ShadowBitmapFactory.reset();
     ShadowDrawable.reset();

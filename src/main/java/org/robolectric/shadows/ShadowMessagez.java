@@ -9,7 +9,7 @@ import org.robolectric.annotation.Implements;
 import org.robolectric.annotation.RealObject;
 
 @Implements(Message.class)
-public class ShadowMessage {
+public class ShadowMessagez {
   private Bundle data;
   private Handler target;
   private long when;
